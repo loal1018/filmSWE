@@ -1,0 +1,56 @@
+{
+  // https://typestrong.org/ts-node/docs/configuration
+  // https://github.com/tsconfig/bases/#node-18-tsconfigjson
+  // https://stackoverflow.com/questions/63742790/unable-to-import-esm-ts-module-in-node/65163089#65163089
+  "extends": "@tsconfig/node20/tsconfig.json",
+  "ts-node": {
+    "esm": true,
+    "module": "es2022",
+    // "experimentalSpecifierResolution": "node"
+    // "transpileOnly": true,
+    // "files": true,
+  },
+  "compilerOptions": {
+    // uebersetzter JS-Code im Hinblick auf Module. "NodeNext" erfordert dasselbe fuer "moduleResolution"
+    // "module": "NodeNext", // entspricht "Node16"
+    "module": "es2022",
+    // Wie werden zu importierende Module im Dateisystem gefunden?
+    // "moduleResolution": "nodenext",
+    "moduleResolution": "node",
+    "moduleDetection": "force", // default: "auto"
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    // "target": "es2023",
+    "target": "es2022",
+    "sourceMap": true,
+    "outDir": "./dist",
+    // "baseUrl": "./", // fuer z.B. webpack https://www.typescriptlang.org/tsconfig#baseUrl
+    "incremental": true,
+    "skipLibCheck": true, // wegen @nestjs/graphql und @nestjs/apollo
+    "allowUnreachableCode": false, // return bei then-else und try-catch
+    "allowUnusedLabels": false, // Labels muessen auch benutzt werden
+    "esModuleInterop": true, // Kompatibilitaet zwischen CommonJS und ES Modulen
+    // "exactOptionalPropertyTypes": true, // bei optionalen Properties ggf. explizit undefined spezifizieren
+    "forceConsistentCasingInFileNames": true, // Gross-/Kleinschreibung bei Dateinamen
+    // "importsNotUsedAsValues": "error", // Fehler bei nicht-benutzen Imports
+    "noErrorTruncation": true,
+    "noFallthroughCasesInSwitch": true, // "break" muss bei switch vorhanden sein
+    "noImplicitAny": true, // Fehler bei implizitem Typ "any"
+    "noImplicitOverride": true, // Schluesselwort "override"
+    "noImplicitReturns": true, // bei jedem Code-Pfad muss es "return" geben
+    "noImplicitThis": true, // Fehler bei this mit implizitem "any"
+    "noUncheckedIndexedAccess": true, // undefined bei Resultaten fuer Index-Signaturen
+    "noUnusedLocals": true, // keine nicht-benutzten lokalen Variablen
+    "noUnusedParameters": true, // keine nicht-benutzen Parameter
+    "preserveWatchOutput": true,
+    "strict": true // alle "strict"-Optionen aktivieren
+    // "noImplicitAny": true, // Fehler bei implizitem Typ "any", default bei strict
+    // "noImplicitThis": true, // Fehler bei this mit implizitem "any", default bei strict
+    // "useUnknownInCatchVariables": true // unknown als default-Typ bei catch-Klauseln, default bei strict
+    // "noPropertyAccessFromIndexSignature": true, // Fehler in __tests__ bei dot-Zugriff auf nicht-definierte Properties, z.B. response.data.statusCode
+    // "allowJs": true, // wegen ts-jest und ESM
+  }
+}

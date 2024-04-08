@@ -1,0 +1,32 @@
+# Copyright (C) 2024 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+global:
+  # How frequently to scrape ("kratzen") target
+  scrape_interval: 3s
+
+# https://prometheus.io/docs/prometheus/latest/configuration/configuration/#scrape_config
+scrape_configs:
+  - job_name: buch
+    scheme: https
+    # https://prometheus.io/docs/prometheus/latest/configuration/configuration/#tls_config
+    tls_config:
+      ca_file: /etc/prometheus/certificate.crt
+      insecure_skip_verify: true
+    metrics_path: /metrics
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+        labels:
+          application: buch

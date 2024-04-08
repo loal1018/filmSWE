@@ -1,0 +1,38 @@
+# Copyright (C) 2022 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose [-f compose.yml -f compose.distroless.yml|compose.wolfi.yml] up
+
+services:
+  trivy:
+    image: aquasec/trivy:0.50.0
+    command: [image, juergenzimmermann/buch:2024.04.0-bookworm]
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/trivy
+        target: /root/.cache
+      - type: bind
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
+    container_name: trivy
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G

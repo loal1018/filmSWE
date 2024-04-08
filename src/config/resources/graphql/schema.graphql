@@ -1,0 +1,145 @@
+# Copyright (C) 2021 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# siehe app.module.ts
+
+schema {
+  query: Query
+  mutation: Mutation
+}
+
+"Funktionen, um Bücherdaten zu lesen"
+type Query {
+  buecher(suchkriterien: SuchkriterienInput): [Buch!]
+
+  buch(id: ID!): Buch
+}
+
+"Funktionen, um Bücher neu anzulegen, zu aktualisieren oder zu löschen"
+type Mutation {
+  create(input: BuchInput!): CreatePayload
+
+  update(input: BuchUpdateInput!): UpdatePayload
+
+  delete(id: ID!): Boolean
+
+  # Mutation, wenn z.B. der Login-Zeitpunkt im IDM-System gespeichert wird
+  login(username: String!, password: String!): LoginResult
+  refresh(refresh_token: String!): LoginResult
+}
+
+"Daten zum Titel eines Buches"
+type Titel {
+  titel: String!
+  untertitel: String
+}
+
+"Daten zum Titel eines Buches"
+type Abbildung {
+  beschriftung: String!
+  contentType: String
+}
+
+"Datenschema zu einem Buch, das gelesen wird"
+type Buch {
+  # ID ist bei Apollo ein String
+  id: Int!
+  version: Int!
+  isbn: String!
+  rating: Int
+  art: Art
+  preis: Float!
+  lieferbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+  # 1:1-Beziehung
+  titel: Titel!
+  # field mit @ResolveField
+  rabatt(short: Boolean): String!
+}
+
+"Enum-Typ für die Art eines Buches"
+enum Art {
+  DRUCKAUSGABE
+  KINDLE
+}
+
+"Suchkriterien für Bücher"
+input SuchkriterienInput {
+  titel: String
+  isbn: String
+  rating: Int
+  art: Art
+  lieferbar: Boolean
+}
+
+"Daten zum Titel eines neuen Buches"
+input TitelInput {
+  titel: String!
+  untertitel: String
+}
+
+"Daten zu den Abbildungen eines Buches"
+input AbbildungInput {
+  beschriftung: String!
+  contentType: String!
+}
+
+"Daten für ein neues Buch"
+input BuchInput {
+  isbn: String
+  rating: Int
+  art: Art
+  preis: Float
+  rabatt: Float
+  lieferbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+  titel: TitelInput!
+  abbildungen: [AbbildungInput!]
+}
+
+type CreatePayload {
+  id: Int
+}
+
+"Daten für ein zu änderndes Buch"
+input BuchUpdateInput {
+  id: ID
+  version: Int
+  isbn: String
+  rating: Int
+  art: Art
+  preis: Float
+  rabatt: Float
+  lieferbar: Boolean
+  datum: String
+  homepage: String
+  schlagwoerter: [String]
+}
+
+type UpdatePayload {
+  version: Int
+}
+
+type LoginResult {
+  access_token: String!
+  expires_in: Int!
+  refresh_token: String!
+  refresh_expires_in: Int!
+  roles: [String!]
+}

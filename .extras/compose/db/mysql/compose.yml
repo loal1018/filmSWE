@@ -1,0 +1,145 @@
+# Copyright (C) 2022 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose up
+#           docker compose exec db bash
+#             ls
+#             id
+#           docker compose down
+
+# https://github.com/compose-spec/compose-spec/blob/master/schema/compose-spec.json
+
+services:
+  db:
+    # https://github.com/docker-library/mysql/blob/master/Dockerfile.oracle
+    image: mysql:8.3.0-oracle
+    ports:
+      - published: 3306
+        target: 3306
+    # /usr/sbin/mysqld --verbose --help
+    # https://dev.mysql.com/doc/refman/8.2/en/using-encrypted-connections.html
+    # /etc/my.cnf
+    # SHOW VARIABLES LIKE "ssl_key";
+    # SHOW VARIABLES LIKE "ssl_cert";
+    # SHOW VARIABLES LIKE "ssl_ca";
+    command:
+      - 'mysqld'
+      - '--ssl-key=/var/lib/mysql-tls/key.pem'
+      - '--ssl-cert=/var/lib/mysql-tls/certificate.crt'
+      - '--ssl-ca=/var/lib/mysql-tls/certificate.crt'
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/db
+        target: /var/lib/mysql
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/mysqld
+        # Link /var/run -> /run
+        # /var/run/mysqld/mysqld.sock
+        target: /run/mysqld
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/log
+        target: /var/log
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/tls/key.pem
+        target: /var/lib/mysql-tls/key.pem
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/tls/certificate.crt
+        target: /var/lib/mysql-tls/certificate.crt
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/csv/buch
+        # https://dev.mysql.com/doc/refman/8.2/en/server-system-variables.html#sysvar_secure_file_priv
+        # /etc/my.cnf
+        # SHOW VARIABLES LIKE "secure_file_priv";
+        target: /var/lib/mysql-files
+      - type: bind
+        source: config.phpmyadmin.inc.php
+        target: /etc/phpmyadmin/config.inc.php
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/sql
+        target: /sql
+        read_only: true
+    env_file: .env
+    environment: [MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db-root-password]
+    # https://docs.docker.com/compose/use-secrets
+    secrets: [db-root-password]
+    security_opt:
+      - label:user:mysql
+      - no-new-privileges:true
+    hostname: mysql
+    container_name: mysql
+    healthcheck:
+      # Passwort erforderlich, falls MYSQL_ALLOW_EMPTY_PASSWORD nicht gesetzt ist
+      test: [CMD, mysqladmin, --user=root, --password=p, --host=mysql, ping]
+      interval: 5s
+      timeout: 2s
+      start_period: 5s
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#cap_add-cap_drop
+    # https://man7.org/linux/man-pages/man7/capabilities.7.html
+    cap_drop: [ALL]
+    # setgid
+    # find: '/var/lib/...'
+    cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # p h p M y A d m i n
+  # ----------------------------------------------------------------------------
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:5.2.1
+    ports:
+      - published: 8889
+        target: 80
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/tls/key.pem
+        target: /var/lib/mysql-tls/key.pem
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/mysql/tls/certificate.crt
+        target: /var/lib/mysql-tls/certificate.crt
+        read_only: true
+    env_file: phpmyadmin.env
+    # KEIN TLS https://blog.zotorn.de/phpmyadmin-docker-image-with-ssl-tls
+    # KEIN dedizierter User im Image vorhanden
+    # https://github.com/phpmyadmin/docker/issues/293
+    hostname: phpmyadmin.mysql.docker
+    container_name: phpmyadmin
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#cap_add-cap_drop
+    # https://man7.org/linux/man-pages/man7/capabilities.7.html
+    cap_drop: [ALL]
+    # setgid
+    cap_add: [CHOWN, SETGID, SETUID]
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 768M
+        reservations:
+          cpus: '0.5'
+          memory: 768M
+
+secrets:
+  db-root-password:
+    file: db_root_password.txt

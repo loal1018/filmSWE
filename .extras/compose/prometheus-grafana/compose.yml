@@ -1,0 +1,65 @@
+# Copyright (C) 2024 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose up
+#             Prometheus: http://localhost:9090
+#             Grafana:    http://localhost:3000
+#             docker compose exec prometheus ash
+#             docker compose exec grafana bash
+#           docker compose down
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.50.1
+    ports:
+      - published: 9090
+        target: 9090
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+      - type: bind
+        source: ./prometheus-data
+        target: /prometheus
+      - type: bind
+        source: ../../../config/resources/tls/certificate.crt
+        target: /etc/prometheus/certificate.crt
+        read_only: true
+    container_name: prometheus
+
+  grafana:
+    image: grafana/grafana:10.3.3
+    ports:
+      - published: 3001
+        target: 3000
+    restart: unless-stopped
+    volumes:
+      - type: bind
+        source: ./grafana-datasources
+        target: /etc/grafana/provisioning/datasources
+        read_only: true
+      - type: bind
+        # SQLite-Datenbank mit z.B. der Tabelle "dashboard"
+        source: ./grafana.db
+        target: /var/lib/grafana/grafana.db
+    environment:
+      # https://grafana.com/docs/grafana/latest/setup-grafana/configure-security/configure-authentication/grafana
+      # default: admin / admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_AUTH_DISABLE_LOGIN_FORM=true
+    container_name: grafana

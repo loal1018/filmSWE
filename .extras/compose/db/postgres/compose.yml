@@ -1,0 +1,146 @@
+# Copyright (C) 2022 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose up
+#           docker compose exec db bash
+#             ls
+#             id
+#           docker compose down
+
+# https://github.com/compose-spec/compose-spec/blob/master/schema/compose-spec.json
+
+services:
+  db:
+    # https://github.com/docker-library/postgres/blob/master/16/bookworm/Dockerfile
+    image: postgres:16.2-bookworm
+    ports:
+      - published: 5432
+        target: 5432
+    restart: unless-stopped
+    # https://dev.to/danvixent/how-to-setup-postgresql-with-ssl-inside-a-docker-container-5f3
+    # https://gist.github.com/mrw34/c97bb03ea1054afb551886ffc8b63c3b
+    # https://stackoverflow.com/questions/55072221/deploying-postgresql-docker-with-ssl-certificate-and-key-with-volumes
+    command:
+      - 'postgres'
+      - '-c'
+      - 'ssl=on'
+      - '-c'
+      - 'ssl_cert_file=/var/lib/postgresql/certificate.crt'
+      - '-c'
+      - 'ssl_key_file=/var/lib/postgresql/key.pem'
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/data
+        target: /var/lib/postgresql/data
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/postgresql.conf
+        target: /etc/postgresql/postgresql.conf
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/tablespace
+        target: /var/lib/postgresql/tablespace
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/tls/key.pem
+        target: /var/lib/postgresql/key.pem
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/tls/certificate.crt
+        target: /var/lib/postgresql/certificate.crt
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/run
+        # .s.PGSQL.5432.lock
+        target: /var/run/postgresql
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/csv/buch
+        target: /csv
+        read_only: true
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/sql
+        target: /sql
+        read_only: true
+    env_file: .env
+    environment:
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    # https://docs.docker.com/compose/use-secrets
+    secrets: [db-password]
+    user: 'postgres:postgres'
+    security_opt:
+      - label:user:postgres
+      - no-new-privileges:true
+    hostname: postgres
+    container_name: postgres
+    healthcheck:
+      test: [CMD, pg_isready, --dbname=postgres, --username=postgres]
+      interval: 5s
+      timeout: 2s
+      start_period: 5s
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#cap_add-cap_drop
+    cap_drop: [ALL]
+    # https://man7.org/linux/man-pages/man7/capabilities.7.html
+    #cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE, NET_BIND_SERVICE, CAP_FOWNER]
+    # https://docs.docker.com/compose/compose-file/deploy
+    deploy:
+      # https://docs.docker.com/compose/compose-file/deploy/#resources
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # p g a d m i n
+  # ----------------------------------------------------------------------------
+  # http://localhost:8888 mit Emailadresse "pgadmin@acme.com" und Passwort "p"
+  pgadmin:
+    image: dpage/pgadmin4:8.4
+    ports:
+      - published: 8888
+        target: 80
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/pgadmin
+        # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
+        # enthaelt u.a. pgadmin4.db als SQLite-DB mit z.B. der Tabelle "user"
+        target: /var/lib/pgadmin
+      - type: bind
+        source: C:/Zimmermann/volumes/postgres/pgadmin4
+        target: /var/lib/pgadmin4
+    env_file: pgadmin.env
+    user: 'pgadmin:5050'
+    hostname: pgadmin
+    container_name: pgadmin
+    # https://docs.docker.com/compose/compose-file/compose-file-v3/#cap_add-cap_drop
+    cap_drop: [ALL]
+    # https://man7.org/linux/man-pages/man7/capabilities.7.html
+    # setgid
+    # find '/var/lib/...'
+    # find '/var/spool/...'
+    # /venv/bin/python3
+    # /venv/bin/gunicorn
+    cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE, NET_BIND_SERVICE]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 2G
+        reservations:
+          cpus: '1.0'
+          memory: 1G
+secrets:
+  db-password:
+    file: db_password.txt

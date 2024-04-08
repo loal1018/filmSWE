@@ -1,0 +1,88 @@
+' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
+'
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+' Preview durch <Alt>d
+
+@startuml Controller-Klasse
+
+interface Promise<T>
+
+package @nestjs/graphql {
+  class "@Resolver" as Resolver
+  hide Resolver circle
+
+  class "@UseGuards" as UseGuards
+  hide UseGuards circle
+
+  class "@UseInterceptors" as UseInterceptors
+  hide UseInterceptors circle
+
+  class "@Mutation" as Mutation
+  hide Mutation circle
+
+  class "@Args" as Args
+  hide Args circle
+}
+
+package nest-keycloak-connect {
+  class AuthGuard
+
+  class "@Roles" as Roles
+  hide Roles circle
+}
+
+package buch #DDDDDD {
+  package entity #FFFFFF {
+    class Buch <<entity>>
+  }
+
+  package service #FFFFFF {
+    class BuchWriteService << control >>
+  }
+
+  class "type BuchDTO = Omit<Buch, 'abbildungen' | 'aktualisiert' | 'erzeugt'" as BuchDTO
+  hide BuchDTO circle
+
+    interface IdInput {
+        id: number
+    }
+
+  class BuchMutationResolver << control >> << @Resolver() >> << @UseGuards() >> << @UseInterceptors() >> {
+    + @Mutation() @Roles() async create(@Args() buchDTO: BuchDTO): Promise<number>
+    + @Mutation() @Roles() async update(@Args() buchDTO: BuchDTO): Promise<number>
+    + @Mutation() @Roles() async delete(@Args() id: IdInput): Promise<boolean>
+  }
+
+  BuchMutationResolver o-down-> "1" BuchWriteService : service
+
+  BuchMutationResolver ..> Buch
+  BuchMutationResolver ..> BuchDTO
+  BuchMutationResolver ..> IdInput
+  BuchDTO .up.> Buch
+  BuchMutationResolver ..> Promise
+  BuchMutationResolver ..> Resolver
+
+  BuchMutationResolver .up.> AuthGuard
+  BuchMutationResolver .up.> Roles
+
+  BuchDTO .[hidden].> Promise
+  BuchDTO .[hidden].> Resolver
+}
+
+hide empty members
+
+footer (c) Juergen Zimmermann
+
+@enduml

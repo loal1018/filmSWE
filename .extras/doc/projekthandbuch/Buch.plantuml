@@ -1,0 +1,82 @@
+' Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
+'
+' This program is free software: you can redistribute it and/or modify
+' it under the terms of the GNU General Public License as published by
+' the Free Software Foundation, either version 3 of the License, or
+' (at your option) any later version.
+'
+' This program is distributed in the hope that it will be useful,
+' but WITHOUT ANY WARRANTY; without even the implied warranty of
+' MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+' GNU General Public License for more details.
+'
+' You should have received a copy of the GNU General Public License
+' along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+' Preview durch <Alt>d
+
+@startuml Entity
+
+package typeorm {
+  class "@Entity" as Entity
+  hide Entity circle
+  class "@Column" as Column
+  hide Column circle
+  class "@PrimaryColumn" as PrimaryColumn
+  hide PrimaryColumn circle
+  class "@OneToMany" as OneToMany
+  hide OneToMany circle
+  class "@JoinColumn" as JoinColumn
+  hide JoinColumn circle
+  class "@ManyToOne" as ManyToOne
+  hide ManyToOne circle
+  class "@CreateDateColumn" as CreateDateColumn
+  hide CreateDateColumn circle
+  class "@UpdateDateColumn" as UpdateDateColumn
+  hide UpdateDateColumn circle
+}
+
+package buch.entity {
+  class "type BuchArt = 'KINDLE' | 'DRUCKAUSGABE'" as BuchArt
+  hide BuchArt circle
+
+  class Buch <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly version: number
+    @Column() readonly isbn: string
+    @Column() readonly rating: number
+    @Column() readonly art: BuchArt
+    @Column() readonly preis: number
+    @Column() readonly rabatt: number
+    @Column() readonly lieferbar: boolean
+    @Column() readonly datum: Date
+    @Column() readonly homepage?: string
+    @Column() readonly schlagwoerter?: string
+    @CreateDateColumn() readonly erzeugt: Date
+    @UpdateDateColumn() readonly aktualisiert: Date
+  }
+
+  class Titel <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly titel: string
+    @Column() readonly untertitel?: string
+  }
+
+  class Abbildung <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly beschriftung: string
+    @Column() readonly contentType?: string
+  }
+
+  Buch *--> "1" Titel : @OneToOne() \ntitel
+  Buch *--> "*" Abbildung : @OneToMany() \nabbildungen
+
+  Buch .right.> Entity
+  Buch .right.> BuchArt
+}
+
+hide empty members
+
+footer (c) Jürgen Zimmermann
+
+@enduml

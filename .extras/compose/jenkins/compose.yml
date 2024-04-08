@@ -1,0 +1,102 @@
+# Copyright (C) 2022 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose up
+#           docker compose exec docker ash
+#               cat /etc/os-release
+#                   Alpine Linux
+#               cat /proc/version
+#                   Kernel 5.10.102.1-microsoft-standard-WSL2
+#               uname -r
+#           docker compose exec jenkins bash
+#               cat /etc/os-release
+#                   ID=debian
+#                   VERSION="12 (bookworm)"
+#           docker compose down
+
+# https://github.com/compose-spec/compose-spec/blob/master/spec.md#compose-file
+# https://github.com/compose-spec/compose-spec/blob/master/spec.md#services-top-level-element
+# https://docs.docker.com/compose/compose-file
+# https://docs.docker.com/compose/compose-file/compose-file-v3
+
+services:
+  docker:
+    image: docker:26.0.0-dind
+    restart: always
+    ports:
+      - published: 3000
+        target: 3000
+      - published: 5000
+        target: 5000
+      - published: 2376
+        target: 2376
+    networks:
+      jenkins-network:
+        # alternative hostnames im virtuellen Netzwerk
+        aliases: [docker]
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/jenkins/certs
+        target: /certs/client
+      - type: bind
+        source: C:/Zimmermann/volumes/jenkins/jenkins_home
+        target: /var/jenkins_home
+    privileged: true
+    env_file: docker.env
+    container_name: docker
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 4G
+
+  jenkins:
+    image: juergenzimmermann/jenkins:2024.04.0
+    restart: always
+    ports:
+      - published: 7070
+        target: 8080
+      - published: 50000
+        target: 50000
+    networks: [jenkins-network]
+    volumes:
+      - type: bind
+        # /var/jenkins_home/workspace enthaelt das Verzeichnis "buch"
+        source: C:/Zimmermann/volumes/jenkins/jenkins_home
+        target: /var/jenkins_home
+      - type: bind
+        source: C:/Zimmermann/volumes/jenkins/certs
+        target: /certs/client
+        read_only: true
+    env_file: .env
+    user: 'jenkins:jenkins'
+    container_name: jenkins
+    hostname: jenkins
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 4G
+
+networks:
+  jenkins-network: {}

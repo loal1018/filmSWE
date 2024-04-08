@@ -1,0 +1,373 @@
+{
+	"info": {
+		"name": "Keycloak",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "New Access Token \"admin\"",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Statuscode 200', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test('Content-Type application/json', () => {\r",
+							"    const { response } = pm;\r",
+							"    const contentType = response.headers.get('Content-Type');\r",
+							"    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+							"});\r",
+							"pm.test('Body mit token, expiresIn, roles', () => {\r",
+							"    const body = pm.response.json();\r",
+							"    console.log(`${JSON.stringify(body)}`);\r",
+							"    const { access_token, expires_in, refresh_token, refresh_expires_in } = body;\r",
+							"    pm.expect(access_token).to.be.a('string').that.matches(/.+\\..+\\..+/u);\r",
+							"    pm.expect(expires_in).to.be.equal(1800);\r",
+							"    pm.expect(refresh_token).to.be.a('string').that.matches(/.+\\..+\\..+/u);\r",
+							"    pm.expect(refresh_expires_in).to.be.equal(3600);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{client_id}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "p",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"acme",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Access Token \"user\"",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Statuscode 200', () => {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test('Content-Type application/json', () => {\r",
+							"    const { response } = pm;\r",
+							"    const contentType = response.headers.get('Content-Type');\r",
+							"    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+							"});\r",
+							"pm.test('Body mit token, expiresIn, roles', () => {\r",
+							"    const body = pm.response.json();\r",
+							"    console.log(`${JSON.stringify(body)}`);\r",
+							"    const { access_token, expires_in, refresh_token, refresh_expires_in } = body;\r",
+							"    pm.expect(access_token).to.be.a('string').that.matches(/.+\\..+\\..+/u);\r",
+							"    pm.expect(expires_in).to.be.equal(1800);\r",
+							"    pm.expect(refresh_token).to.be.a('string').that.matches(/.+\\..+\\..+/u);\r",
+							"    pm.expect(refresh_expires_in).to.be.equal(3600);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{client_id}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "user",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "p",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"acme",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Access Token Invalid Username",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Statuscode 401', () => {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{client_id}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "FALSCH",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "p",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"acme",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "New Access Token Invalid Password",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Statuscode 401', () => {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{client_id}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "password",
+							"type": "text"
+						},
+						{
+							"key": "username",
+							"value": "admin",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "FALSCH",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"acme",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Access Token",
+			"request": {
+				"auth": {
+					"type": "basic",
+					"basic": [
+						{
+							"key": "password",
+							"value": "{{client_secret}}",
+							"type": "string"
+						},
+						{
+							"key": "username",
+							"value": "{{client_id}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "grant_type",
+							"value": "refresh_token",
+							"type": "text"
+						},
+						{
+							"key": "refresh_token",
+							"value": "eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NDg1ODZmNi1iYjg5LTQ0MGEtYmFiNi01NGFlYWZmOGQ1ZjgifQ.eyJleHAiOjE3MDYxMTY1NTIsImlhdCI6MTcwNjExMjk1MywianRpIjoiYTU2MjBmMDUtODk3ZS00ZmFiLTk4OWEtZWY4ODA2YjJlZTZjIiwiaXNzIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9hY21lIiwiYXVkIjoiaHR0cDovL2xvY2FsaG9zdDo4MDgwL3JlYWxtcy9hY21lIiwic3ViIjoiZjkxNTZhYmYtNmRhNS00OGJmLWJjMWMtODEzM2FhZTI3NDE0IiwidHlwIjoiUmVmcmVzaCIsImF6cCI6ImJ1Y2gtY2xpZW50Iiwic2Vzc2lvbl9zdGF0ZSI6ImU0OGRjODVmLTg2MDctNGEyYy05ZTZkLTkyNzdiY2QzNzJhZCIsInNjb3BlIjoicHJvZmlsZSBlbWFpbCIsInNpZCI6ImU0OGRjODVmLTg2MDctNGEyYy05ZTZkLTkyNzdiY2QzNzJhZCJ9.tNJ6Rt_55sQjAeNE-X4n0xLv7sIo4POrI_BNIg6s2bU",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:8080/realms/acme/protocol/openid-connect/token",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"realms",
+						"acme",
+						"protocol",
+						"openid-connect",
+						"token"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

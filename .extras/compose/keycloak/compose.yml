@@ -1,0 +1,68 @@
+# Copyright (C) 2022 - present Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker compose up
+#           docker compose exec keycloak bash
+#             ls /opt/keycloak/data
+#             ls -l /opt/keycloak/data/h2/keycloakdb.mv.db
+#           docker compose down
+
+# java -jar h2-2.2.224.jar
+#     https://github.com/keycloak/keycloak/blob/main/pom.xml#L95
+#     https://repo.maven.apache.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
+#     Generic H2 (Embedded)
+#     JDBC URL:       jdbc:h2:tcp://localhost/C:/Zimmermann/volumes/keycloak/h2/keycloakdb
+#     Benutzername:   sa
+#     Passwort:       password
+#         Tabellen: USER_ENTITY, USER_ROLE_MAPPING, ...
+
+services:
+  keycloak:
+    image: keycloak/keycloak:24.0.1-0
+    #depends_on: [postgres]
+    ports:
+      - published: 8080
+        target: 8080
+      - published: 8443
+        target: 8443
+    volumes:
+      - type: bind
+        source: C:/Zimmermann/volumes/keycloak
+        # mit Unterverzeichnis h2
+        target: /opt/keycloak/data
+      - type: bind
+        source: key.pem
+        target: /opt/keycloak/conf/key.pem
+        read_only: true
+      - type: bind
+        source: certificate.crt
+        target: /opt/keycloak/conf/certificate.crt
+        read_only: true
+      # ggf. /opt/keycloak/conf/keycloak.conf
+    env_file: .env
+    hostname: keycloak
+    container_name: keycloak
+    user: keycloak:1000
+    # --features=token-exchange
+    entrypoint: ['/opt/keycloak/bin/kc.sh', 'start-dev']
+    cap_drop: [ALL]
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '2.0'
+          memory: 2G

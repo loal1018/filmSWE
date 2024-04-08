@@ -1,0 +1,138 @@
+# syntax=docker/dockerfile:1.7.0
+
+# Copyright (C) 2023 - Juergen Zimmermann, Hochschule Karlsruhe
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+# Aufruf:   docker build --tag juergenzimmermann/buch:2024.04.0-wolfi --file Dockerfile.wolfi .
+#               ggf. --progress=plain
+#               ggf. --no-cache
+#           Get-Content Dockerfile.wolfi | docker run --rm --interactive hadolint/hadolint:2.12.1-beta-debian
+#               Linux:   cat Dockerfile.wolfi | docker run --rm --interactive hadolint/hadolint:2.12.1-beta-debian
+#           docker network ls
+
+# https://docs.docker.com/engine/reference/builder/#syntax
+# https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md
+# https://hub.docker.com/r/docker/dockerfile
+# https://docs.docker.com/build/building/multi-stage
+# https://github.com/textbook/starter-kit/blob/main/Dockerfile
+# https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker
+
+# Wolfi
+#  - minimales Community Linux von Chainguard
+#  - nutzt den Linux-Kernel der Laufzeitumgebung, z.B. Container Runtime
+#  - glibc als C-Bibliothek und nicht musl wie bei Alpine
+#  - apk als Package-Format wie bei Alpine
+#  - mit Node 18 ca. 110 MB
+#  - https://github.com/wolfi-dev
+#  - https://chainguard.dev
+
+# ---------------------------------------------------------------------------------------
+# S t a g e   d i s t
+# ---------------------------------------------------------------------------------------
+# mit npm und Shell https://edu.chainguard.dev/chainguard/chainguard-images/reference/node/image_specs
+FROM cgr.dev/chainguard/node:latest-dev AS dist
+
+WORKDIR /app
+
+# ggf. Python fuer Argon2
+# https://packages.debian.org/bookworm/python3-minimal
+# "python3-dev" enthaelt "multiprocessing"
+# "build-essential" enthaelt "make"
+# apt-get install --no-install-recommends --yes python3.11-minimal=3.11.2-6 python3.11-dev=3.11.2-6 build-essential=12.9
+
+USER root
+RUN <<EOF
+# https://explainshell.com/explain?cmd=set+-eux
+set -eux
+npm i -g --no-audit --no-fund npm
+EOF
+
+USER node
+
+COPY src ./src
+
+# https://docs.docker.com/engine/reference/builder/#run---mounttypebind
+RUN --mount=type=bind,source=package.json,target=package.json \
+  --mount=type=bind,source=package-lock.json,target=package-lock.json \
+  --mount=type=bind,source=nest-cli.json,target=nest-cli.json \
+  --mount=type=bind,source=tsconfig.json,target=tsconfig.json \
+  --mount=type=bind,source=tsconfig.build.json,target=tsconfig.build.json \
+  --mount=type=cache,target=/root/.npm <<EOF
+set -eux
+# ci (= clean install) mit package-lock.json
+npm ci --no-audit --no-fund
+npm run build
+EOF
+
+# ------------------------------------------------------------------------------
+# S t a g e   d e p e n d e n c i e s
+# ------------------------------------------------------------------------------
+FROM cgr.dev/chainguard/node:latest-dev AS dependencies
+
+WORKDIR /app
+
+USER root
+
+RUN <<EOF
+set -eux
+npm i -g --no-audit --no-fund npm
+EOF
+
+USER node
+
+RUN --mount=type=bind,source=package.json,target=package.json \
+  --mount=type=bind,source=package-lock.json,target=package-lock.json \
+  --mount=type=cache,target=/root/.npm <<EOF
+set -eux
+# ci (= clean install) mit package-lock.json
+# --omit=dev: ohne devDependencies
+npm ci --omit=dev --no-audit --no-fund
+EOF
+
+# ------------------------------------------------------------------------------
+# S t a g e   f i n a l
+# ------------------------------------------------------------------------------
+# Node LTS = 18.x
+FROM cgr.dev/chainguard/node:latest AS final
+# FROM cgr.dev/chainguard/node:latest-dev as final
+
+# Anzeige bei "docker inspect ..."
+# https://specs.opencontainers.org/image-spec/annotations
+# https://spdx.org/licenses
+# MAINTAINER ist deprecated https://docs.docker.com/engine/reference/builder/#maintainer-deprecated
+LABEL org.opencontainers.image.title="buch" \
+  org.opencontainers.image.description="Appserver buch mit Basis-Image Wolfi" \
+  org.opencontainers.image.version="2024.04.0-wolfi" \
+  org.opencontainers.image.licenses="GPL-3.0-or-later" \
+  org.opencontainers.image.authors="Juergen.Zimmermann@h-ka.de"
+
+WORKDIR /opt/app
+
+# TODO: dumb-init installieren: apt-get, apk, ...?
+
+USER node
+
+COPY --chown=node:node package.json .env ./
+COPY --from=dependencies --chown=node:node /app/node_modules ./node_modules
+COPY --from=dist --chown=node:node /app/dist ./dist
+COPY --chown=node:node src/config/resources ./dist/config/resources
+
+EXPOSE 3000
+
+# Bei CMD statt ENTRYPOINT kann das Kommando bei "docker run ..." ueberschrieben werden
+# "Array Syntax" damit auch <Strg>C funktioniert
+# https://github.com/Yelp/dumb-init
+# ENTRYPOINT ["dumb-init", "/usr/bin/node", "dist/main.js"]
+ENTRYPOINT ["/usr/bin/node", "dist/main.js"]
