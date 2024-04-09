@@ -20,18 +20,18 @@ schema {
   mutation: Mutation
 }
 
-"Funktionen, um Bücherdaten zu lesen"
+"Funktionen, um Filmdaten zu lesen"
 type Query {
-  buecher(suchkriterien: SuchkriterienInput): [Buch!]
+  buecher(suchkriterien: SuchkriterienInput): [Film!]
 
-  buch(id: ID!): Buch
+  film(id: ID!): Film
 }
 
-"Funktionen, um Bücher neu anzulegen, zu aktualisieren oder zu löschen"
+"Funktionen, um Filme neu anzulegen, zu aktualisieren oder zu löschen"
 type Mutation {
-  create(input: BuchInput!): CreatePayload
+  create(input: FilmInput!): CreatePayload
 
-  update(input: BuchUpdateInput!): UpdatePayload
+  update(input: FilmUpdateInput!): UpdatePayload
 
   delete(id: ID!): Boolean
 
@@ -40,20 +40,20 @@ type Mutation {
   refresh(refresh_token: String!): LoginResult
 }
 
-"Daten zum Titel eines Buches"
+"Daten zum Titel eines Filmes"
 type Titel {
   titel: String!
   untertitel: String
 }
 
-"Daten zum Titel eines Buches"
+"Daten zum Titel eines Filmes"
 type Abbildung {
   beschriftung: String!
   contentType: String
 }
 
-"Datenschema zu einem Buch, das gelesen wird"
-type Buch {
+"Datenschema zu einem Film, das gelesen wird"
+type Film {
   # ID ist bei Apollo ein String
   id: Int!
   version: Int!
@@ -71,13 +71,13 @@ type Buch {
   rabatt(short: Boolean): String!
 }
 
-"Enum-Typ für die Art eines Buches"
+"Enum-Typ für die Art eines Filmes"
 enum Art {
   DRUCKAUSGABE
   KINDLE
 }
 
-"Suchkriterien für Bücher"
+"Suchkriterien für Filme"
 input SuchkriterienInput {
   titel: String
   isbn: String
@@ -86,20 +86,20 @@ input SuchkriterienInput {
   lieferbar: Boolean
 }
 
-"Daten zum Titel eines neuen Buches"
+"Daten zum Titel eines neuen Filmes"
 input TitelInput {
   titel: String!
   untertitel: String
 }
 
-"Daten zu den Abbildungen eines Buches"
+"Daten zu den Abbildungen eines Filmes"
 input AbbildungInput {
   beschriftung: String!
   contentType: String!
 }
 
-"Daten für ein neues Buch"
-input BuchInput {
+"Daten für ein neues Film"
+input FilmInput {
   isbn: String
   rating: Int
   art: Art
@@ -117,8 +117,8 @@ type CreatePayload {
   id: Int
 }
 
-"Daten für ein zu änderndes Buch"
-input BuchUpdateInput {
+"Daten für ein zu änderndes Film"
+input FilmUpdateInput {
   id: ID
   version: Int
   isbn: String

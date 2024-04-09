@@ -20,11 +20,11 @@ import { AuthGuard, Roles } from 'nest-keycloak-connect';
 import { IsInt, IsNumberString, Min } from 'class-validator';
 import { UseFilters, UseGuards, UseInterceptors } from '@nestjs/common';
 import { type Abbildung } from '../entity/abbildung.entity.js';
-import { type Buch } from '../entity/buch.entity.js';
-import { BuchDTO } from '../rest/buchDTO.entity.js';
-import { BuchWriteService } from '../service/buch-write.service.js';
+import { type Film } from '../entity/film.entity.js';
+import { FilmDTO } from '../rest/filmDTO.entity.js';
+import { FilmWriteService } from '../service/film-write.service.js';
 import { HttpExceptionFilter } from './http-exception.filter.js';
-import { type IdInput } from './buch-query.resolver.js';
+import { type IdInput } from './film-query.resolver.js';
 import { ResponseTimeInterceptor } from '../../logger/response-time.interceptor.js';
 import { type Titel } from '../entity/titel.entity.js';
 import { getLogger } from '../../logger/logger.js';
@@ -48,7 +48,7 @@ export interface UpdatePayload {
     readonly version: number;
 }
 
-export class BuchUpdateDTO extends BuchDTO {
+export class FilmUpdateDTO extends FilmDTO {
     @IsNumberString()
     readonly id!: string;
 
@@ -61,43 +61,43 @@ export class BuchUpdateDTO extends BuchDTO {
 @UseGuards(AuthGuard)
 @UseFilters(HttpExceptionFilter)
 @UseInterceptors(ResponseTimeInterceptor)
-export class BuchMutationResolver {
-    readonly #service: BuchWriteService;
+export class FilmMutationResolver {
+    readonly #service: FilmWriteService;
 
-    readonly #logger = getLogger(BuchMutationResolver.name);
+    readonly #logger = getLogger(FilmMutationResolver.name);
 
-    constructor(service: BuchWriteService) {
+    constructor(service: FilmWriteService) {
         this.#service = service;
     }
 
     @Mutation()
     @Roles({ roles: ['admin', 'user'] })
-    async create(@Args('input') buchDTO: BuchDTO) {
-        this.#logger.debug('create: buchDTO=%o', buchDTO);
+    async create(@Args('input') filmDTO: FilmDTO) {
+        this.#logger.debug('create: filmDTO=%o', filmDTO);
 
-        const buch = this.#buchDtoToBuch(buchDTO);
-        const id = await this.#service.create(buch);
+        const film = this.#filmDtoToFilm(filmDTO);
+        const id = await this.#service.create(film);
         // TODO BadUserInputError
-        this.#logger.debug('createBuch: id=%d', id);
+        this.#logger.debug('createFilm: id=%d', id);
         const payload: CreatePayload = { id };
         return payload;
     }
 
     @Mutation()
     @Roles({ roles: ['admin', 'user'] })
-    async update(@Args('input') buchDTO: BuchUpdateDTO) {
-        this.#logger.debug('update: buch=%o', buchDTO);
+    async update(@Args('input') filmDTO: FilmUpdateDTO) {
+        this.#logger.debug('update: film=%o', filmDTO);
 
-        const buch = this.#buchUpdateDtoToBuch(buchDTO);
-        const versionStr = `"${buchDTO.version.toString()}"`;
+        const film = this.#filmUpdateDtoToFilm(filmDTO);
+        const versionStr = `"${filmDTO.version.toString()}"`;
 
         const versionResult = await this.#service.update({
-            id: Number.parseInt(buchDTO.id, 10),
-            buch,
+            id: Number.parseInt(filmDTO.id, 10),
+            film,
             version: versionStr,
         });
         // TODO BadUserInputError
-        this.#logger.debug('updateBuch: versionResult=%d', versionResult);
+        this.#logger.debug('updateFilm: versionResult=%d', versionResult);
         const payload: UpdatePayload = { version: versionResult };
         return payload;
     }
@@ -108,39 +108,39 @@ export class BuchMutationResolver {
         const idStr = id.id;
         this.#logger.debug('delete: id=%s', idStr);
         const deletePerformed = await this.#service.delete(idStr);
-        this.#logger.debug('deleteBuch: deletePerformed=%s', deletePerformed);
+        this.#logger.debug('deleteFilm: deletePerformed=%s', deletePerformed);
         return deletePerformed;
     }
 
-    #buchDtoToBuch(buchDTO: BuchDTO): Buch {
-        const titelDTO = buchDTO.titel;
+    #filmDtoToFilm(filmDTO: FilmDTO): Film {
+        const titelDTO = filmDTO.titel;
         const titel: Titel = {
             id: undefined,
             titel: titelDTO.titel,
             untertitel: titelDTO.untertitel,
-            buch: undefined,
+            film: undefined,
         };
-        const abbildungen = buchDTO.abbildungen?.map((abbildungDTO) => {
+        const abbildungen = filmDTO.abbildungen?.map((abbildungDTO) => {
             const abbildung: Abbildung = {
                 id: undefined,
                 beschriftung: abbildungDTO.beschriftung,
                 contentType: abbildungDTO.contentType,
-                buch: undefined,
+                film: undefined,
             };
             return abbildung;
         });
-        const buch: Buch = {
+        const film: Film = {
             id: undefined,
             version: undefined,
-            isbn: buchDTO.isbn,
-            rating: buchDTO.rating,
-            art: buchDTO.art,
-            preis: buchDTO.preis,
-            rabatt: buchDTO.rabatt,
-            lieferbar: buchDTO.lieferbar,
-            datum: buchDTO.datum,
-            homepage: buchDTO.homepage,
-            schlagwoerter: buchDTO.schlagwoerter,
+            isbn: filmDTO.isbn,
+            rating: filmDTO.rating,
+            art: filmDTO.art,
+            preis: filmDTO.preis,
+            rabatt: filmDTO.rabatt,
+            lieferbar: filmDTO.lieferbar,
+            datum: filmDTO.datum,
+            homepage: filmDTO.homepage,
+            schlagwoerter: filmDTO.schlagwoerter,
             titel,
             abbildungen,
             erzeugt: new Date(),
@@ -148,23 +148,23 @@ export class BuchMutationResolver {
         };
 
         // Rueckwaertsverweis
-        buch.titel!.buch = buch;
-        return buch;
+        film.titel!.film = film;
+        return film;
     }
 
-    #buchUpdateDtoToBuch(buchDTO: BuchUpdateDTO): Buch {
+    #filmUpdateDtoToFilm(filmDTO: FilmUpdateDTO): Film {
         return {
             id: undefined,
             version: undefined,
-            isbn: buchDTO.isbn,
-            rating: buchDTO.rating,
-            art: buchDTO.art,
-            preis: buchDTO.preis,
-            rabatt: buchDTO.rabatt,
-            lieferbar: buchDTO.lieferbar,
-            datum: buchDTO.datum,
-            homepage: buchDTO.homepage,
-            schlagwoerter: buchDTO.schlagwoerter,
+            isbn: filmDTO.isbn,
+            rating: filmDTO.rating,
+            art: filmDTO.art,
+            preis: filmDTO.preis,
+            rabatt: filmDTO.rabatt,
+            lieferbar: filmDTO.lieferbar,
+            datum: filmDTO.datum,
+            homepage: filmDTO.homepage,
+            schlagwoerter: filmDTO.schlagwoerter,
             titel: undefined,
             abbildungen: undefined,
             erzeugt: undefined,
@@ -172,7 +172,7 @@ export class BuchMutationResolver {
         };
     }
 
-    // #errorMsgCreateBuch(err: CreateError) {
+    // #errorMsgCreateFilm(err: CreateError) {
     //     switch (err.type) {
     //         case 'IsbnExists': {
     //             return `Die ISBN ${err.isbn} existiert bereits`;
@@ -183,10 +183,10 @@ export class BuchMutationResolver {
     //     }
     // }
 
-    // #errorMsgUpdateBuch(err: UpdateError) {
+    // #errorMsgUpdateFilm(err: UpdateError) {
     //     switch (err.type) {
-    //         case 'BuchNotExists': {
-    //             return `Es gibt kein Buch mit der ID ${err.id}`;
+    //         case 'FilmNotExists': {
+    //             return `Es gibt kein Film mit der ID ${err.id}`;
     //         }
     //         case 'VersionInvalid': {
     //             return `"${err.version}" ist keine gueltige Versionsnummer`;

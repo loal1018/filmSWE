@@ -16,8 +16,8 @@
  */
 import { Args, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql';
 import { UseFilters, UseInterceptors } from '@nestjs/common';
-import { Buch } from '../entity/buch.entity.js';
-import { BuchReadService } from '../service/buch-read.service.js';
+import { Film } from '../entity/film.entity.js';
+import { FilmReadService } from '../service/film-read.service.js';
 import { HttpExceptionFilter } from './http-exception.filter.js';
 import { Public } from 'nest-keycloak-connect';
 import { ResponseTimeInterceptor } from '../../logger/response-time.interceptor.js';
@@ -32,33 +32,33 @@ export interface SuchkriterienInput {
     readonly suchkriterien: Suchkriterien;
 }
 
-@Resolver((_: any) => Buch)
+@Resolver((_: any) => Film)
 @UseFilters(HttpExceptionFilter)
 @UseInterceptors(ResponseTimeInterceptor)
-export class BuchQueryResolver {
-    readonly #service: BuchReadService;
+export class FilmQueryResolver {
+    readonly #service: FilmReadService;
 
-    readonly #logger = getLogger(BuchQueryResolver.name);
+    readonly #logger = getLogger(FilmQueryResolver.name);
 
-    constructor(service: BuchReadService) {
+    constructor(service: FilmReadService) {
         this.#service = service;
     }
 
-    @Query('buch')
+    @Query('film')
     @Public()
     async findById(@Args() { id }: IdInput) {
         this.#logger.debug('findById: id=%d', id);
 
-        const buch = await this.#service.findById({ id });
+        const film = await this.#service.findById({ id });
 
         if (this.#logger.isLevelEnabled('debug')) {
             this.#logger.debug(
-                'findById: buch=%s, titel=%o',
-                buch.toString(),
-                buch.titel,
+                'findById: film=%s, titel=%o',
+                film.toString(),
+                film.titel,
             );
         }
-        return buch;
+        return film;
     }
 
     @Query('buecher')
@@ -71,15 +71,15 @@ export class BuchQueryResolver {
     }
 
     @ResolveField('rabatt')
-    rabatt(@Parent() buch: Buch, short: boolean | undefined) {
+    rabatt(@Parent() film: Film, short: boolean | undefined) {
         if (this.#logger.isLevelEnabled('debug')) {
             this.#logger.debug(
-                'rabatt: buch=%s, short=%s',
-                buch.toString(),
+                'rabatt: film=%s, short=%s',
+                film.toString(),
                 short,
             );
         }
-        const rabatt = buch.rabatt ?? 0;
+        const rabatt = film.rabatt ?? 0;
         const shortStr = short === undefined || short ? '%' : 'Prozent';
         // eslint-disable-next-line @typescript-eslint/no-magic-numbers
         return `${(rabatt * 100).toFixed(2)} ${shortStr}`;
