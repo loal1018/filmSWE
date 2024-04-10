@@ -1,3 +1,4 @@
+
 /*
  * Copyright (C) 2016 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
  *
@@ -58,33 +59,33 @@ import { dbType } from '../../config/db.js';
 /**
  * Alias-Typ für gültige Strings bei der Art eines Buches.
  */
-export type BuchArt = 'DRUCKAUSGABE' | 'KINDLE';
+export type FilmArt = 'DVD' | 'BLUERAY';
 
 /**
  * Entity-Klasse zu einem relationalen Tabelle
  */
 // https://typeorm.io/entities
 @Entity()
-export class Buch {
+export class Film {
     // https://typeorm.io/entities#primary-columns
     // default: strategy = 'increment' (SEQUENCE, GENERATED ALWAYS AS IDENTITY, AUTO_INCREMENT)
     @PrimaryGeneratedColumn()
     id: number | undefined;
 
     @VersionColumn()
-    readonly version: number | undefined;
+    readonly erscheinungsjahr: number | undefined;
 
     @Column()
-    @ApiProperty({ example: '0-0070-0644-6', type: String })
-    readonly isbn!: string;
+    @ApiProperty({ example: '4-011470212981', type: String })
+    readonly barcode!: string;
 
     @Column('int')
     @ApiProperty({ example: 5, type: Number })
     readonly rating: number | undefined;
 
     @Column('varchar')
-    @ApiProperty({ example: 'DRUCKAUSGABE', type: String })
-    readonly art: BuchArt | undefined;
+    @ApiProperty({ example: 'BLUERAY', type: String })
+    readonly art: FilmArt | undefined;
 
     @Column('decimal', {
         precision: 8,
@@ -113,7 +114,7 @@ export class Buch {
     readonly datum: Date | string | undefined;
 
     @Column('date')
-    @ApiProperty({ example: 'https://test.de/', type: String })
+    @ApiProperty({ example: 'https://www.imdb.com/', type: String })
     readonly homepage: string | undefined;
 
     // https://typeorm.io/entities#simple-array-column-type
@@ -122,13 +123,13 @@ export class Buch {
     schlagwoerter: string[] | null | undefined;
 
     // undefined wegen Updates
-    @OneToOne(() => Titel, (titel) => titel.buch, {
+    @OneToOne(() => Titel, (titel) => titel.film, {
         cascade: ['insert', 'remove'],
     })
     readonly titel: Titel | undefined;
 
     // undefined wegen Updates
-    @OneToMany(() => Abbildung, (abbildung) => abbildung.buch, {
+    @OneToMany(() => Abbildung, (abbildung) => abbildung.film, {
         cascade: ['insert', 'remove'],
     })
     readonly abbildungen: Abbildung[] | undefined;
@@ -151,8 +152,8 @@ export class Buch {
     public toString = (): string =>
         JSON.stringify({
             id: this.id,
-            version: this.version,
-            isbn: this.isbn,
+            erscheinungsjahr: this.erscheinungsjahr,
+            barcode: this.barcode,
             rating: this.rating,
             art: this.art,
             preis: this.preis,
