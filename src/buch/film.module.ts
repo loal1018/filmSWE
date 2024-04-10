@@ -15,8 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { BuchGetController } from './rest/buch-get.controller.js';
-import { BuchMutationResolver } from './graphql/buch-mutation.resolver.js';
-import { BuchQueryResolver } from './graphql/buch-query.resolver.js';
+import { BuchMutationResolver } from './graphql/film-mutation.resolver.js';
+import { BuchQueryResolver } from './graphql/film-query.resolver.js';
 import { BuchReadService } from './service/buch-read.service.js';
 import { BuchWriteController } from './rest/buch-write.controller.js';
 import { BuchWriteService } from './service/buch-write.service.js';
@@ -29,7 +29,7 @@ import { entities } from './entity/entities.js';
 
 /**
  * Das Modul besteht aus Controller- und Service-Klassen für die Verwaltung von
- * Bücher.
+ * Filmen.
  * @packageDocumentation
  */
 
