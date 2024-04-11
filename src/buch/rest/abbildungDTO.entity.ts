@@ -20,9 +20,7 @@
  * Das Modul besteht aus der Entity-Klasse.
  * @packageDocumentation
  */
-/*
-Test
-*/
+
 import { ApiProperty } from '@nestjs/swagger';
 import { MaxLength } from 'class-validator';
 
