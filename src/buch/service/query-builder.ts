@@ -21,7 +21,7 @@
  */
 
 import { Abbildung } from '../entity/abbildung.entity.js';
-import { Buch } from '../entity/buch.entity.js';
+import { Film } from '../entity/film.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
@@ -30,9 +30,9 @@ import { Titel } from '../entity/titel.entity.js';
 import { getLogger } from '../../logger/logger.js';
 import { typeOrmModuleOptions } from '../../config/typeormOptions.js';
 
-/** Typdefinitionen für die Suche mit der Buch-ID. */
+/** Typdefinitionen für die Suche mit der Film-ID. */
 export interface BuildIdParams {
-    /** ID des gesuchten Buchs. */
+    /** ID des gesuchten Films. */
     readonly id: number;
     /** Sollen die Abbildungen mitgeladen werden? */
     readonly mitAbbildungen?: boolean;
@@ -43,9 +43,9 @@ export interface BuildIdParams {
  */
 @Injectable()
 export class QueryBuilder {
-    readonly #buchAlias = `${Buch.name
+    readonly #filmAlias = `${Film.name
         .charAt(0)
-        .toLowerCase()}${Buch.name.slice(1)}`;
+        .toLowerCase()}${Film.name.slice(1)}`;
 
     readonly #titelAlias = `${Titel.name
         .charAt(0)
@@ -55,47 +55,47 @@ export class QueryBuilder {
         .charAt(0)
         .toLowerCase()}${Abbildung.name.slice(1)}`;
 
-    readonly #repo: Repository<Buch>;
+    readonly #repo: Repository<Film>;
 
     readonly #logger = getLogger(QueryBuilder.name);
 
-    constructor(@InjectRepository(Buch) repo: Repository<Buch>) {
+    constructor(@InjectRepository(Film) repo: Repository<Film>) {
         this.#repo = repo;
     }
 
     /**
-     * Ein Buch mit der ID suchen.
-     * @param id ID des gesuchten Buches
+     * Ein FIlm mit der ID suchen.
+     * @param id ID des gesuchten Films
      * @returns QueryBuilder
      */
     buildId({ id, mitAbbildungen = false }: BuildIdParams) {
-        // QueryBuilder "buch" fuer Repository<Buch>
-        const queryBuilder = this.#repo.createQueryBuilder(this.#buchAlias);
+        // QueryBuilder "film" fuer Repository<Film>
+        const queryBuilder = this.#repo.createQueryBuilder(this.#filmAlias);
 
-        // Fetch-Join: aus QueryBuilder "buch" die Property "titel" ->  Tabelle "titel"
+        // Fetch-Join: aus QueryBuilder "film" die Property "titel" ->  Tabelle "titel"
         queryBuilder.innerJoinAndSelect(
-            `${this.#buchAlias}.titel`,
+            `${this.#filmAlias}.titel`,
             this.#titelAlias,
         );
 
         if (mitAbbildungen) {
-            // Fetch-Join: aus QueryBuilder "buch" die Property "abbildungen" -> Tabelle "abbildung"
+            // Fetch-Join: aus QueryBuilder "film" die Property "abbildungen" -> Tabelle "abbildung"
             queryBuilder.leftJoinAndSelect(
-                `${this.#buchAlias}.abbildungen`,
+                `${this.#filmAlias}.abbildungen`,
                 this.#abbildungAlias,
             );
         }
 
-        queryBuilder.where(`${this.#buchAlias}.id = :id`, { id: id }); // eslint-disable-line object-shorthand
+        queryBuilder.where(`${this.#filmAlias}.id = :id`, { id: id }); // eslint-disable-line object-shorthand
         return queryBuilder;
     }
 
     /**
-     * Bücher asynchron suchen.
+     * Filme asynchron suchen.
      * @param suchkriterien JSON-Objekt mit Suchkriterien
      * @returns QueryBuilder
      */
-    // z.B. { titel: 'a', rating: 5, javascript: true }
+    // z.B. { titel: 'a', rating: 5 }
     // "rest properties" fuer anfaengliche WHERE-Klausel: ab ES 2018 https://github.com/tc39/proposal-object-rest-spread
     // eslint-disable-next-line max-lines-per-function
     build({ titel, javascript, typescript, ...props }: Suchkriterien) {
@@ -107,8 +107,8 @@ export class QueryBuilder {
             props,
         );
 
-        let queryBuilder = this.#repo.createQueryBuilder(this.#buchAlias);
-        queryBuilder.innerJoinAndSelect(`${this.#buchAlias}.titel`, 'titel');
+        let queryBuilder = this.#repo.createQueryBuilder(this.#filmAlias);
+        queryBuilder.innerJoinAndSelect(`${this.#filmAlias}.titel`, 'titel');
 
         // z.B. { titel: 'a', rating: 5, javascript: true }
         // "rest properties" fuer anfaengliche WHERE-Klausel: ab ES 2018 https://github.com/tc39/proposal-object-rest-spread
@@ -133,10 +133,10 @@ export class QueryBuilder {
         if (javascript === 'true') {
             queryBuilder = useWhere
                 ? queryBuilder.where(
-                      `${this.#buchAlias}.schlagwoerter like '%JAVASCRIPT%'`,
+                      `${this.#filmAlias}.schlagwoerter like '%JAVASCRIPT%'`,
                   )
                 : queryBuilder.andWhere(
-                      `${this.#buchAlias}.schlagwoerter like '%JAVASCRIPT%'`,
+                      `${this.#filmAlias}.schlagwoerter like '%JAVASCRIPT%'`,
                   );
             useWhere = false;
         }
@@ -144,10 +144,10 @@ export class QueryBuilder {
         if (typescript === 'true') {
             queryBuilder = useWhere
                 ? queryBuilder.where(
-                      `${this.#buchAlias}.schlagwoerter like '%TYPESCRIPT%'`,
+                      `${this.#filmAlias}.schlagwoerter like '%TYPESCRIPT%'`,
                   )
                 : queryBuilder.andWhere(
-                      `${this.#buchAlias}.schlagwoerter like '%TYPESCRIPT%'`,
+                      `${this.#filmAlias}.schlagwoerter like '%TYPESCRIPT%'`,
                   );
             useWhere = false;
         }
@@ -158,11 +158,11 @@ export class QueryBuilder {
             param[key] = (props as Record<string, any>)[key]; // eslint-disable-line @typescript-eslint/no-unsafe-assignment, security/detect-object-injection
             queryBuilder = useWhere
                 ? queryBuilder.where(
-                      `${this.#buchAlias}.${key} = :${key}`,
+                      `${this.#filmAlias}.${key} = :${key}`,
                       param,
                   )
                 : queryBuilder.andWhere(
-                      `${this.#buchAlias}.${key} = :${key}`,
+                      `${this.#filmAlias}.${key} = :${key}`,
                       param,
                   );
             useWhere = false;

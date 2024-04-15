@@ -1,27 +1,10 @@
-/*
- * Copyright (C) 2016 - present Juergen Zimmermann, Hochschule Karlsruhe
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
-
 /**
- * Das Modul besteht aus der Klasse {@linkcode BuchReadService}.
+ * Das Modul besteht aus der Klasse {@linkcode FilmReadService}.
  * @packageDocumentation
  */
 
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Buch } from './../entity/buch.entity.js';
+import { Film } from '../entity/film.entity.js';
 import { QueryBuilder } from './query-builder.js';
 import { type Suchkriterien } from './suchkriterien.js';
 import { getLogger } from '../../logger/logger.js';
@@ -30,29 +13,29 @@ import { getLogger } from '../../logger/logger.js';
  * Typdefinition für `findById`
  */
 export interface FindByIdParams {
-    /** ID des gesuchten Buchs */
+    /** ID des gesuchten Film */
     readonly id: number;
     /** Sollen die Abbildungen mitgeladen werden? */
     readonly mitAbbildungen?: boolean;
 }
 
 /**
- * Die Klasse `BuchReadService` implementiert das Lesen für Bücher und greift
+ * Die Klasse `FilmReadService` implementiert das Lesen für Bücher und greift
  * mit _TypeORM_ auf eine relationale DB zu.
  */
 @Injectable()
-export class BuchReadService {
+export class FilmReadService {
     static readonly ID_PATTERN = /^[1-9]\d{0,10}$/u;
 
-    readonly #buchProps: string[];
+    readonly #filmProps: string[];
 
     readonly #queryBuilder: QueryBuilder;
 
-    readonly #logger = getLogger(BuchReadService.name);
+    readonly #logger = getLogger(FilmReadService.name);
 
     constructor(queryBuilder: QueryBuilder) {
-        const buchDummy = new Buch();
-        this.#buchProps = Object.getOwnPropertyNames(buchDummy);
+        const filmDummy = new Film();
+        this.#filmProps = Object.getOwnPropertyNames(filmDummy);
         this.#queryBuilder = queryBuilder;
     }
 
@@ -69,50 +52,48 @@ export class BuchReadService {
     //              Im Promise-Objekt ist dann die Fehlerursache enthalten.
 
     /**
-     * Ein Buch asynchron anhand seiner ID suchen
-     * @param id ID des gesuchten Buches
-     * @returns Das gefundene Buch vom Typ [Buch](buch_entity_buch_entity.Buch.html)
+     * Ein Film asynchron anhand seiner ID suchen
+     * @param id ID des gesuchten Filmes
+     * @returns Der gefundene Film vom Typ [Film](film_entity_film_entity.Film.html)
      *          in einem Promise aus ES2015.
-     * @throws NotFoundException falls kein Buch mit der ID existiert
+     * @throws NotFoundException falls kein Film mit der ID existiert
      */
-    // https://2ality.com/2015/01/es6-destructuring.html#simulating-named-parameters-in-javascript
     async findById({ id, mitAbbildungen = false }: FindByIdParams) {
         this.#logger.debug('findById: id=%d', id);
 
-        // https://typeorm.io/working-with-repository
         // Das Resultat ist undefined, falls kein Datensatz gefunden
         // Lesen: Keine Transaktion erforderlich
-        const buch = await this.#queryBuilder
+        const film = await this.#queryBuilder
             .buildId({ id, mitAbbildungen })
             .getOne();
-        if (buch === null) {
-            throw new NotFoundException(`Es gibt kein Buch mit der ID ${id}.`);
+        if (film === null) {
+            throw new NotFoundException(`Es gibt kein Film mit der ID ${id}.`);
         }
-        if (buch.schlagwoerter === null) {
-            buch.schlagwoerter = [];
+        if (film.schlagwoerter === null) {
+            film.schlagwoerter = [];
         }
 
         if (this.#logger.isLevelEnabled('debug')) {
             this.#logger.debug(
-                'findById: buch=%s, titel=%o',
-                buch.toString(),
-                buch.titel,
+                'findById: film=%s, titel=%o',
+                film.toString(),
+                film.titel,
             );
             if (mitAbbildungen) {
                 this.#logger.debug(
                     'findById: abbildungen=%o',
-                    buch.abbildungen,
+                    film.abbildungen,
                 );
             }
         }
-        return buch;
+        return film;
     }
 
     /**
-     * Bücher asynchron suchen.
+     * Filme asynchron suchen.
      * @param suchkriterien JSON-Objekt mit Suchkriterien
-     * @returns Ein JSON-Array mit den gefundenen Büchern.
-     * @throws NotFoundException falls keine Bücher gefunden wurden.
+     * @returns Ein JSON-Array mit den gefundenen Filmen.
+     * @throws NotFoundException falls keine Filmen gefunden wurden.
      */
     async find(suchkriterien?: Suchkriterien) {
         this.#logger.debug('find: suchkriterien=%o', suchkriterien);
@@ -134,28 +115,28 @@ export class BuchReadService {
         // QueryBuilder https://typeorm.io/select-query-builder
         // Das Resultat ist eine leere Liste, falls nichts gefunden
         // Lesen: Keine Transaktion erforderlich
-        const buecher = await this.#queryBuilder.build(suchkriterien).getMany();
-        if (buecher.length === 0) {
-            this.#logger.debug('find: Keine Buecher gefunden');
+        const filme = await this.#queryBuilder.build(suchkriterien).getMany();
+        if (filme.length === 0) {
+            this.#logger.debug('find: Keine Filme gefunden');
             throw new NotFoundException(
-                `Keine Buecher gefunden: ${JSON.stringify(suchkriterien)}`,
+                `Keine Filme gefunden: ${JSON.stringify(suchkriterien)}`,
             );
         }
-        buecher.forEach((buch) => {
-            if (buch.schlagwoerter === null) {
-                buch.schlagwoerter = [];
+        filme.forEach((film) => {
+            if (film.schlagwoerter === null) {
+                film.schlagwoerter = [];
             }
         });
-        this.#logger.debug('find: buecher=%o', buecher);
-        return buecher;
+        this.#logger.debug('find: filme=%o', filme);
+        return filme;
     }
 
     #checkKeys(keys: string[]) {
-        // Ist jedes Suchkriterium auch eine Property von Buch oder "schlagwoerter"?
+        // Ist jedes Suchkriterium auch eine Property von Film oder "schlagwoerter"?
         let validKeys = true;
         keys.forEach((key) => {
             if (
-                !this.#buchProps.includes(key) &&
+                !this.#filmProps.includes(key) &&
                 key !== 'javascript' &&
                 key !== 'typescript'
             ) {
