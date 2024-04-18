@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file, @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-classes-per-file */
 /*
  * Copyright (C) 2016 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
  *
@@ -25,7 +25,6 @@ import {
     ArrayUnique,
     IsArray,
     IsBoolean,
-    IsISBN,
     IsISO8601,
     IsInt,
     IsOptional,
@@ -38,7 +37,7 @@ import {
 } from 'class-validator';
 import { AbbildungDTO } from './abbildungDTO.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { type BuchArt } from '../entity/buch.entity.js';
+import { type FilmArt } from '../entity/film.entity.js';
 import { TitelDTO } from './titelDTO.entity.js';
 import { Type } from 'class-transformer';
 
@@ -47,12 +46,7 @@ export const MAX_RATING = 5;
 /**
  * Entity-Klasse für Bücher ohne TypeORM und ohne Referenzen.
  */
-export class BuchDtoOhneRef {
-    // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s13.html
-    @IsISBN(13)
-    @ApiProperty({ example: '978-0-007-00644-1', type: String })
-    readonly isbn!: string;
-
+export class FilmDtoOhneRef {
     @IsInt()
     @Min(0)
     @Max(MAX_RATING)
@@ -62,7 +56,7 @@ export class BuchDtoOhneRef {
     @Matches(/^DRUCKAUSGABE$|^KINDLE$/u)
     @IsOptional()
     @ApiProperty({ example: 'DRUCKAUSGABE', type: String })
-    readonly art: BuchArt | undefined;
+    readonly art: FilmArt | undefined;
 
     @IsPositive()
     @ApiProperty({ example: 1, type: Number })
@@ -98,7 +92,7 @@ export class BuchDtoOhneRef {
 /**
  * Entity-Klasse für Bücher ohne TypeORM.
  */
-export class BuchDTO extends BuchDtoOhneRef {
+export class FilmDTO extends FilmDtoOhneRef {
     @ValidateNested()
     @Type(() => TitelDTO)
     @ApiProperty({ type: TitelDTO })
@@ -113,4 +107,4 @@ export class BuchDTO extends BuchDtoOhneRef {
 
     // AbbildungDTO
 }
-/* eslint-enable max-classes-per-file, @typescript-eslint/no-magic-numbers */
+/* eslint-enable max-classes-per-file */
