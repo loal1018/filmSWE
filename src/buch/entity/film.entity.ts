@@ -73,7 +73,7 @@ export class Film {
     id: number | undefined;
 
     @VersionColumn()
-    readonly erscheinungsjahr: number | undefined;
+    readonly fassung: number | undefined;
 
     @Column()
     @ApiProperty({ example: '4-011470212981', type: String })
@@ -85,7 +85,7 @@ export class Film {
 
     @Column('varchar')
     @ApiProperty({ example: 'BLUERAY', type: String })
-    readonly art: FilmArt | undefined;
+    readonly filmart: FilmArt | undefined;
 
     @Column('decimal', {
         precision: 8,
@@ -101,26 +101,16 @@ export class Film {
         scale: 3,
         transformer: new DecimalTransformer(),
     })
-    @ApiProperty({ example: 0.1, type: Number })
-    readonly rabatt: number | undefined;
-
-    @Column('decimal') // TypeORM unterstuetzt bei Oracle *NICHT* den Typ boolean
-    @ApiProperty({ example: true, type: Boolean })
-    readonly lieferbar: boolean | undefined;
 
     @Column('date')
     @ApiProperty({ example: '2021-01-31' })
     // TypeORM unterstuetzt *NICHT* das Temporal-API (ES2022)
-    readonly datum: Date | string | undefined;
-
-    @Column('date')
-    @ApiProperty({ example: 'https://www.imdb.com/', type: String })
-    readonly homepage: string | undefined;
+    readonly release: Date | string | undefined;
 
     // https://typeorm.io/entities#simple-array-column-type
     // nicht "readonly": null ersetzen durch []
     @Column('simple-array')
-    schlagwoerter: string[] | null | undefined;
+    genre: string[] | null | undefined;
 
     // undefined wegen Updates
     @OneToOne(() => Titel, (titel) => titel.film, {
@@ -152,16 +142,13 @@ export class Film {
     public toString = (): string =>
         JSON.stringify({
             id: this.id,
-            erscheinungsjahr: this.erscheinungsjahr,
+            fassung: this.fassung,
             barcode: this.barcode,
             rating: this.rating,
-            art: this.art,
+            filmart: this.filmart,
             preis: this.preis,
-            rabatt: this.rabatt,
-            lieferbar: this.lieferbar,
-            datum: this.datum,
-            homepage: this.homepage,
-            schlagwoerter: this.schlagwoerter,
+            release: this.release,
+            genre: this.genre,
             erzeugt: this.erzeugt,
             aktualisiert: this.aktualisiert,
         });
