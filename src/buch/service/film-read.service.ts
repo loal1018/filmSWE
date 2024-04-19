@@ -69,8 +69,8 @@ export class FilmReadService {
         if (film === null) {
             throw new NotFoundException(`Es gibt kein Film mit der ID ${id}.`);
         }
-        if (film.schlagwoerter === null) {
-            film.schlagwoerter = [];
+        if (film.genre === null) {
+            film.genre = [];
         }
 
         if (this.#logger.isLevelEnabled('debug')) {
@@ -123,8 +123,8 @@ export class FilmReadService {
             );
         }
         filme.forEach((film) => {
-            if (film.schlagwoerter === null) {
-                film.schlagwoerter = [];
+            if (film.genre === null) {
+                film.genre = [];
             }
         });
         this.#logger.debug('find: filme=%o', filme);
@@ -132,13 +132,13 @@ export class FilmReadService {
     }
 
     #checkKeys(keys: string[]) {
-        // Ist jedes Suchkriterium auch eine Property von Film oder "schlagwoerter"?
+        // Ist jedes Suchkriterium auch eine Property von Film oder "genre"?
         let validKeys = true;
         keys.forEach((key) => {
             if (
                 !this.#filmProps.includes(key) &&
-                key !== 'javascript' &&
-                key !== 'typescript'
+                key !== 'dvd' &&
+                key !== 'bluray'
             ) {
                 this.#logger.debug(
                     '#checkKeys: ungueltiges Suchkriterium "%s"',

@@ -25,8 +25,8 @@ export interface UpdateParams {
     readonly id: number | undefined;
     /** Film-Objekt mit den aktualisierten Werten. */
     readonly film: Film;
-    /** Versionsnummer für die aktualisierenden Werte. */
-    readonly version: string;
+    /** Fassung für die aktualisierenden Werte. */
+    readonly fassung: string;
 }
 
 /**
@@ -76,26 +76,26 @@ export class FilmWriteService {
     /**
      * Ein vorhandener Film soll aktualisiert werden. "Destructured" Argument
      * mit id (ID des zu aktualisierenden Films), film (zu aktualisierendes Film)
-     * und version (Versionsnummer für optimistische Synchronisation).
-     * @returns Die neue Versionsnummer gemäß optimistischer Synchronisation
+     * und fassung (Fassung für optimistische Synchronisation).
+     * @returns Die neue Fassung gemäß optimistischer Synchronisation
      * @throws NotFoundException falls kein Film zur ID vorhanden ist
-     * @throws VersionInvalidException falls die Versionsnummer ungültig ist
-     * @throws VersionOutdatedException falls die Versionsnummer veraltet ist
+     * @throws VersionInvalidException falls die Fassung ungültig ist
+     * @throws VersionOutdatedException falls die Fassung veraltet ist
      */
     // https://2ality.com/2015/01/es6-destructuring.html#simulating-named-parameters-in-javascript
-    async update({ id, film, version }: UpdateParams): Promise<number> {
+    async update({ id, film, fassung }: UpdateParams): Promise<number> {
         this.#logger.debug(
-            'update: id=%d, film=%o, version=%s',
+            'update: id=%d, film=%o, fassung=%s',
             id,
             film,
-            version,
+            fassung,
         );
         if (id === undefined) {
             this.#logger.debug('update: Keine gueltige ID');
             throw new NotFoundException(`Es gibt kein Film mit der ID ${id}.`);
         }
 
-        const validateResult = await this.#validateUpdate(film, id, version);
+        const validateResult = await this.#validateUpdate(film, id, fassung);
         this.#logger.debug('update: validateResult=%o', validateResult);
         if (!(validateResult instanceof Film)) {
             return validateResult;
@@ -107,7 +107,7 @@ export class FilmWriteService {
         const updated = await this.#repo.save(merged); // implizite Transaktion
         this.#logger.debug('update: updated=%o', updated);
 
-        return updated.version!;
+        return updated.fassung!;
     }
 
     /**
@@ -165,32 +165,32 @@ export class FilmWriteService {
     async #validateUpdate(
         film: Film,
         id: number,
-        versionStr: string,
+        fassungStr: string,
     ): Promise<Film> {
         this.#logger.debug(
-            '#validateUpdate: film=%o, id=%s, versionStr=%s',
+            '#validateUpdate: film=%o, id=%s, fassungStr=%s',
             film,
             id,
-            versionStr,
+            fassungStr,
         );
-        if (!FilmWriteService.VERSION_PATTERN.test(versionStr)) {
-            throw new VersionInvalidException(versionStr);
+        if (!FilmWriteService.VERSION_PATTERN.test(fassungStr)) {
+            throw new VersionInvalidException(fassungStr);
         }
 
-        const version = Number.parseInt(versionStr.slice(1, -1), 10);
+        const fassung = Number.parseInt(fassungStr.slice(1, -1), 10);
         this.#logger.debug(
-            '#validateUpdate: film=%o, version=%d',
+            '#validateUpdate: film=%o, fassung=%d',
             film,
-            version,
+            fassung,
         );
 
         const filmDb = await this.#readService.findById({ id });
 
         // nullish coalescing
-        const versionDb = filmDb.version!;
-        if (version < versionDb) {
-            this.#logger.debug('#validateUpdate: versionDb=%d', version);
-            throw new VersionOutdatedException(version);
+        const fassungDb = filmDb.fassung!;
+        if (fassung < fassungDb) {
+            this.#logger.debug('#validateUpdate: fassungDb=%d', fassung);
+            throw new VersionOutdatedException(fassung);
         }
         this.#logger.debug('#validateUpdate: filmDb=%o', filmDb);
         return filmDb;

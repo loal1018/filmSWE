@@ -28,13 +28,11 @@ import { type FilmArt } from './../entity/film.entity.js';
 export interface Suchkriterien {
     readonly barcode?: string;
     readonly rating?: number;
-    readonly art?: FilmArt;
+    readonly filmart?: FilmArt;
     readonly preis?: number;
     readonly rabatt?: number;
-    readonly lieferbar?: boolean;
-    readonly datum?: string;
-    readonly homepage?: string;
-    readonly javascript?: string;
-    readonly typescript?: string;
+    readonly release?: string;
+    readonly dvd?: string;
+    readonly bluray?: string;
     readonly titel?: string;
 }
