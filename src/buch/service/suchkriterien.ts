@@ -32,7 +32,7 @@ export interface Suchkriterien {
     readonly preis?: number;
     readonly rabatt?: number;
     readonly release?: string;
-    readonly dvd?: string;
-    readonly bluray?: string;
+    readonly action?: string;
+    readonly comedy?: string;
     readonly titel?: string;
 }

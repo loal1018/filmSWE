@@ -98,12 +98,12 @@ export class QueryBuilder {
     // z.B. { titel: 'a', rating: 5 }
     // "rest properties" fuer anfaengliche WHERE-Klausel: ab ES 2018 https://github.com/tc39/proposal-object-rest-spread
     // eslint-disable-next-line max-lines-per-function
-    build({ titel, dvd, bluray, ...props }: Suchkriterien) {
+    build({ titel, action, comedy, ...props }: Suchkriterien) {
         this.#logger.debug(
-            'build: titel=%s, dvd=%s, bluray=%s, props=%o',
+            'build: titel=%s, action=%s, comedy=%s, props=%o',
             titel,
-            dvd,
-            bluray,
+            action,
+            comedy,
             props,
         );
 
@@ -130,20 +130,20 @@ export class QueryBuilder {
             useWhere = false;
         }
 
-        if (dvd === 'true') {
+        if (action === 'true') {
             queryBuilder = useWhere
-                ? queryBuilder.where(`${this.#filmAlias}.genre like '%DVD%'`)
+                ? queryBuilder.where(`${this.#filmAlias}.genre like '%ACTION%'`)
                 : queryBuilder.andWhere(
-                      `${this.#filmAlias}.genre like '%DVD%'`,
+                      `${this.#filmAlias}.genre like '%ACTION%'`,
                   );
             useWhere = false;
         }
 
-        if (bluray === 'true') {
+        if (comedy === 'true') {
             queryBuilder = useWhere
-                ? queryBuilder.where(`${this.#filmAlias}.genre like '%BLURAY%'`)
+                ? queryBuilder.where(`${this.#filmAlias}.genre like '%COMEDY%'`)
                 : queryBuilder.andWhere(
-                      `${this.#filmAlias}.genre like '%BLURAY%'`,
+                      `${this.#filmAlias}.genre like '%COMEDY%'`,
                   );
             useWhere = false;
         }
