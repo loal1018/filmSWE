@@ -81,26 +81,25 @@ export class FilmDtoOhneRef {
     readonly schlagwoerter: string[] | undefined;
 
     @IsOptional()
-    @ApiProperty({ example: '1234567890000', type: String})
+    @ApiProperty({ example: '1234567890000', type: String })
     readonly barcode: string | undefined;
 
     @Min(1)
-    @ApiProperty({ example: 1, type: Number})
+    @ApiProperty({ example: 1, type: Number })
     readonly fassung: number | undefined;
 
     @IsOptional()
-    @ApiProperty({ example: 'Horror', type: String})
-    readonly genre: string | undefined;
+    @ApiProperty({ example: 'Horror', type: String })
+    readonly genre: string[] | undefined;
 
     @IsOptional()
     @ApiProperty({ example: 'BLUERAY', type: String })
     readonly filmart: FilmArt | undefined;
-    
+
     @IsISO8601({ strict: true })
     @IsOptional()
     @ApiProperty({ example: '2021-01-31' })
     readonly release: Date | string | undefined;
-
 }
 
 /**

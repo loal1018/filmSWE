@@ -61,13 +61,13 @@ export class FilmQueryResolver {
         return film;
     }
 
-    @Query('buecher')
+    @Query('filme')
     @Public()
     async find(@Args() input: SuchkriterienInput | undefined) {
         this.#logger.debug('find: input=%o', input);
-        const buecher = await this.#service.find(input?.suchkriterien);
-        this.#logger.debug('find: buecher=%o', buecher);
-        return buecher;
+        const filme = await this.#service.find(input?.suchkriterien);
+        this.#logger.debug('find: filme=%o', filme);
+        return filme;
     }
 
     @ResolveField('rabatt')

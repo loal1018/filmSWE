@@ -38,7 +38,6 @@ import { getLogger } from '../../logger/logger.js';
 //  GraphQL AuthZ
 //      https://github.com/AstrumU/graphql-authz
 //      https://www.the-guild.dev/blog/graphql-authz
-//hallo2
 
 export interface CreatePayload {
     readonly id: number;
@@ -89,12 +88,12 @@ export class FilmMutationResolver {
         this.#logger.debug('update: film=%o', filmDTO);
 
         const film = this.#filmUpdateDtoToFilm(filmDTO);
-        const versionStr = `"${filmDTO.version.toString()}"`;
+        const fassungStr = `"${filmDTO.version.toString()}"`;
 
         const versionResult = await this.#service.update({
             id: Number.parseInt(filmDTO.id, 10),
             film,
-            version: versionStr,
+            fassung: fassungStr,
         });
         // TODO BadUserInputError
         this.#logger.debug('updateFilm: versionResult=%d', versionResult);
@@ -131,16 +130,13 @@ export class FilmMutationResolver {
         });
         const film: Film = {
             id: undefined,
-            version: undefined,
-            isbn: filmDTO.isbn,
+            fassung: undefined,
+            barcode: filmDTO.barcode,
             rating: filmDTO.rating,
-            art: filmDTO.art,
             preis: filmDTO.preis,
-            rabatt: filmDTO.rabatt,
-            lieferbar: filmDTO.lieferbar,
-            datum: filmDTO.datum,
-            homepage: filmDTO.homepage,
-            schlagwoerter: filmDTO.schlagwoerter,
+            genre: filmDTO.genre,
+            filmart: filmDTO.filmart,
+            release: filmDTO.release,
             titel,
             abbildungen,
             erzeugt: new Date(),
@@ -155,16 +151,13 @@ export class FilmMutationResolver {
     #filmUpdateDtoToFilm(filmDTO: FilmUpdateDTO): Film {
         return {
             id: undefined,
-            version: undefined,
-            isbn: filmDTO.isbn,
+            fassung: undefined,
+            barcode: filmDTO.barcode,
             rating: filmDTO.rating,
-            art: filmDTO.art,
             preis: filmDTO.preis,
-            rabatt: filmDTO.rabatt,
-            lieferbar: filmDTO.lieferbar,
-            datum: filmDTO.datum,
-            homepage: filmDTO.homepage,
-            schlagwoerter: filmDTO.schlagwoerter,
+            genre: filmDTO.genre,
+            filmart: filmDTO.filmart,
+            release: filmDTO.release,
             titel: undefined,
             abbildungen: undefined,
             erzeugt: undefined,
