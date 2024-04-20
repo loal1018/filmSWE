@@ -60,6 +60,8 @@ import { type Titel } from '../entity/titel.entity.js';
 import { getBaseUri } from './getBaseUri.js';
 import { getLogger } from '../../logger/logger.js';
 import { paths } from '../../config/paths.js';
+import { FilmArt } from '../entity/film.entity';
+import { release } from 'os';
 
 const MSG_FORBIDDEN = 'Kein Token mit ausreichender Berechtigung vorhanden';
 /**
@@ -116,7 +118,7 @@ export class FilmWriteController {
     }
 
     /**
-     * Ein vorhandenes Film wird asynchron aktualisiert.
+     * Ein vorhandener Film wird asynchron aktualisiert.
      *
      * Im Request-Objekt von Express muss die ID des zu aktualisierenden Filmes
      * als Pfad-Parameter enthalten sein. Außerdem muss im Rumpf das zu
@@ -136,7 +138,7 @@ export class FilmWriteController {
      *
      * @param filmDTO Filmdaten im Body des Request-Objekts.
      * @param id Pfad-Paramater für die ID.
-     * @param version Versionsnummer aus dem Header _If-Match_.
+     * @param fassung Versionsnummer aus dem Header _If-Match_.
      * @param res Leeres Response-Objekt von Express.
      * @returns Leeres Promise-Objekt.
      */
@@ -156,7 +158,7 @@ export class FilmWriteController {
     @ApiNoContentResponse({ description: 'Erfolgreich aktualisiert' })
     @ApiBadRequestResponse({ description: 'Fehlerhafte Filmdaten' })
     @ApiPreconditionFailedResponse({
-        description: 'Falsche Version im Header "If-Match"',
+        description: 'Falsche Fassung im Header "If-Match"',
     })
     @ApiResponse({
         status: HttpStatus.PRECONDITION_REQUIRED,
@@ -166,17 +168,17 @@ export class FilmWriteController {
     async put(
         @Body() filmDTO: FilmDtoOhneRef,
         @Param('id') id: number,
-        @Headers('If-Match') version: string | undefined,
+        @Headers('If-Match') fassung: string | undefined,
         @Res() res: Response,
     ): Promise<Response> {
         this.#logger.debug(
-            'put: id=%s, filmDTO=%o, version=%s',
+            'put: id=%s, filmDTO=%o, Fassung=%s',
             id,
             filmDTO,
-            version,
+            fassung,
         );
 
-        if (version === undefined) {
+        if (fassung === undefined) {
             const msg = 'Header "If-Match" fehlt';
             this.#logger.debug('put: msg=%s', msg);
             return res
@@ -186,9 +188,9 @@ export class FilmWriteController {
         }
 
         const film = this.#filmDtoOhneRefToFilm(filmDTO);
-        const neueVersion = await this.#service.update({ id, film, version });
-        this.#logger.debug('put: version=%d', neueVersion);
-        return res.header('ETag', `"${neueVersion}"`).send();
+        const neueFassung = await this.#service.update({ id, film, fassung });
+        this.#logger.debug('put: fassung=%d', neueFassung);
+        return res.header('ETag', `"${neueFassung}"`).send();
     }
 
     /**
@@ -230,22 +232,20 @@ export class FilmWriteController {
         });
         const film = {
             id: undefined,
-            version: undefined,
+            fassung: undefined,
             barcode: filmDTO.barcode,
             rating: filmDTO.rating,
-            art: filmDTO.art,
             preis: filmDTO.preis,
-            rabatt: filmDTO.rabatt,
-            lieferbar: filmDTO.lieferbar,
             datum: filmDTO.datum,
-            homepage: filmDTO.homepage,
-            schlagwoerter: filmDTO.schlagwoerter,
+            genre: filmDTO.genre,
+            filmart: filmDTO.filmart,
+            release: filmDTO.release,
             titel,
             abbildungen,
             erzeugt: new Date(),
             aktualisiert: new Date(),
         };
-
+    
         // Rueckwaertsverweise
         film.titel.film = film;
         film.abbildungen?.forEach((abbildung) => {
@@ -257,19 +257,16 @@ export class FilmWriteController {
     #filmDtoOhneRefToFilm(filmDTO: FilmDtoOhneRef): Film {
         return {
             id: undefined,
-            version: undefined,
-            barcode: filmDTO.barcoe,
+            fassung: undefined,
+            barcode: filmDTO.barcode,
             rating: filmDTO.rating,
-            art: filmDTO.art,
             preis: filmDTO.preis,
-            rabatt: filmDTO.rabatt,
-            lieferbar: filmDTO.lieferbar,
-            datum: filmDTO.datum,
-            homepage: filmDTO.homepage,
-            schlagwoerter: filmDTO.schlagwoerter,
+            genre: undefined,
             titel: undefined,
             abbildungen: undefined,
             erzeugt: undefined,
+            filmart: filmDTO.filmart,
+            release: undefined,
             aktualisiert: new Date(),
         };
     }

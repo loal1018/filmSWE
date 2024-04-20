@@ -22,7 +22,6 @@
  */
 
 import {
-    ArrayUnique,
     IsArray,
     IsBoolean,
     IsISO8601,
@@ -30,7 +29,6 @@ import {
     IsOptional,
     IsPositive,
     IsUrl,
-    Matches,
     Max,
     Min,
     ValidateNested,
@@ -52,11 +50,6 @@ export class FilmDtoOhneRef {
     @Max(MAX_RATING)
     @ApiProperty({ example: 5, type: Number })
     readonly rating: number | undefined;
-
-    @Matches(/^DRUCKAUSGABE$|^KINDLE$/u)
-    @IsOptional()
-    @ApiProperty({ example: 'DRUCKAUSGABE', type: String })
-    readonly art: FilmArt | undefined;
 
     @IsPositive()
     @ApiProperty({ example: 1, type: Number })
@@ -84,13 +77,34 @@ export class FilmDtoOhneRef {
     readonly homepage: string | undefined;
 
     @IsOptional()
-    @ArrayUnique()
     @ApiProperty({ example: ['JAVASCRIPT', 'TYPESCRIPT'] })
     readonly schlagwoerter: string[] | undefined;
+
+    @IsOptional()
+    @ApiProperty({ example: '1234567890000', type: String})
+    readonly barcode: string | undefined;
+
+    @Min(1)
+    @ApiProperty({ example: 1, type: Number})
+    readonly fassung: number | undefined;
+
+    @IsOptional()
+    @ApiProperty({ example: 'Horror', type: String})
+    readonly genre: string | undefined;
+
+    @IsOptional()
+    @ApiProperty({ example: 'BLUERAY', type: String })
+    readonly filmart: FilmArt | undefined;
+    
+    @IsISO8601({ strict: true })
+    @IsOptional()
+    @ApiProperty({ example: '2021-01-31' })
+    readonly release: Date | string | undefined;
+
 }
 
 /**
- * Entity-Klasse für Bücher ohne TypeORM.
+ * Entity-Klasse für Filme ohne TypeORM.
  */
 export class FilmDTO extends FilmDtoOhneRef {
     @ValidateNested()

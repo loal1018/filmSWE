@@ -86,7 +86,7 @@ export type TitelModel = Omit<Titel, 'film' | 'id'>;
 /** Film-Objekt mit HATEOAS-Links */
 export type FilmModel = Omit<
     Film,
-    'abbildungen' | 'aktualisiert' | 'erzeugt' | 'id' | 'titel' | 'version'
+    'abbildungen' | 'aktualisiert' | 'erzeugt' | 'id' | 'titel' | 'fassung'
 > & {
     titel: TitelModel;
     // eslint-disable-next-line @typescript-eslint/naming-convention
@@ -113,28 +113,19 @@ export interface FilmeModel {
  */
 export class FilmQuery implements Suchkriterien {
     @ApiProperty({ required: false })
-    declare readonly isbn: string;
+    declare readonly barcode: string;
 
     @ApiProperty({ required: false })
     declare readonly rating: number;
 
     @ApiProperty({ required: false })
-    declare readonly art: FilmArt;
+    declare readonly genre: string;
 
     @ApiProperty({ required: false })
     declare readonly preis: number;
 
     @ApiProperty({ required: false })
-    declare readonly rabatt: number;
-
-    @ApiProperty({ required: false })
-    declare readonly lieferbar: boolean;
-
-    @ApiProperty({ required: false })
     declare readonly datum: string;
-
-    @ApiProperty({ required: false })
-    declare readonly homepage: string;
 
     @ApiProperty({ required: false })
     declare readonly javascript: string;
@@ -237,13 +228,13 @@ export class FilmGetController {
         }
 
         // ETags
-        const versionDb = film.version;
-        if (version === `"${versionDb}"`) {
+        const releaseDb = film.release;
+        if (version === `"${releaseDb}"`) {
             this.#logger.debug('getById: NOT_MODIFIED');
             return res.sendStatus(HttpStatus.NOT_MODIFIED);
         }
-        this.#logger.debug('getById: versionDb=%s', versionDb);
-        res.header('ETag', `"${versionDb}"`);
+        this.#logger.debug('getById: releaseDB=%s', releaseDb);
+        res.header('ETag', `"${releaseDb}"`);
 
         // HATEOAS mit Atom Links und HAL (= Hypertext Application Language)
         const filmModel = this.#toModel(film, req);
@@ -321,16 +312,12 @@ export class FilmGetController {
             untertitel: film.titel?.untertitel ?? 'N/A',
         };
         const filmModel: FilmModel = {
-            erscheinungsjahr: film.erscheinungsjahr,
             barcode: film.barcode,
             rating: film.rating,
-            art: film.art,
+            filmart: film.filmart,
             preis: film.preis,
-            rabatt: film.rabatt,
-            lieferbar: film.lieferbar,
-            datum: film.datum,
-            homepage: film.homepage,
-            schlagwoerter: film.schlagwoerter,
+            release: film.release,
+            genre: film.genre,
             titel: titelModel,
             _links: links,
         };
