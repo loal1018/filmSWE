@@ -1,5 +1,6 @@
+/* eslint-disable @typescript-eslint/no-magic-numbers */
 /*
- * Copyright (C) 2016 - present Juergen Zimmermann, Hochschule Karlsruhe
+ * Copyright (C) 2023 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,25 +17,23 @@
  */
 
 /**
- * Das Modul besteht aus der Klasse {@linkcode BuchReadService}.
+ * Das Modul besteht aus der Entity-Klasse.
  * @packageDocumentation
  */
 
-import { type BuchArt } from './../entity/buch.entity.js';
+import { ApiProperty } from '@nestjs/swagger';
+import { MaxLength } from 'class-validator';
 
 /**
- * Typdefinition für `BuchReadService.find()`und `QueryBuilder.build()`
+ * Entity-Klasse für Abbildung ohne TypeORM.
  */
-export interface Suchkriterien {
-    readonly isbn?: string;
-    readonly rating?: number;
-    readonly art?: BuchArt;
-    readonly preis?: number;
-    readonly rabatt?: number;
-    readonly lieferbar?: boolean;
-    readonly datum?: string;
-    readonly homepage?: string;
-    readonly javascript?: string;
-    readonly typescript?: string;
-    readonly titel?: string;
+export class AbbildungDTO {
+    @MaxLength(32)
+    @ApiProperty({ example: 'Die Beschriftung', type: String })
+    readonly beschriftung!: string;
+
+    @MaxLength(16)
+    @ApiProperty({ example: 'image/png', type: String })
+    readonly contentType!: string;
 }
+/* eslint-enable @typescript-eslint/no-magic-numbers */

@@ -1,4 +1,4 @@
-/* eslint-disable max-classes-per-file, @typescript-eslint/no-magic-numbers */
+/* eslint-disable max-classes-per-file */
 /*
  * Copyright (C) 2016 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
  *
@@ -22,23 +22,20 @@
  */
 
 import {
-    ArrayUnique,
     IsArray,
     IsBoolean,
-    IsISBN,
     IsISO8601,
     IsInt,
     IsOptional,
     IsPositive,
     IsUrl,
-    Matches,
     Max,
     Min,
     ValidateNested,
 } from 'class-validator';
 import { AbbildungDTO } from './abbildungDTO.entity.js';
 import { ApiProperty } from '@nestjs/swagger';
-import { type BuchArt } from '../entity/buch.entity.js';
+import { type FilmArt } from '../entity/film.entity.js';
 import { TitelDTO } from './titelDTO.entity.js';
 import { Type } from 'class-transformer';
 
@@ -47,22 +44,12 @@ export const MAX_RATING = 5;
 /**
  * Entity-Klasse für Bücher ohne TypeORM und ohne Referenzen.
  */
-export class BuchDtoOhneRef {
-    // https://www.oreilly.com/library/view/regular-expressions-cookbook/9781449327453/ch04s13.html
-    @IsISBN(13)
-    @ApiProperty({ example: '978-0-007-00644-1', type: String })
-    readonly isbn!: string;
-
+export class FilmDtoOhneRef {
     @IsInt()
     @Min(0)
     @Max(MAX_RATING)
     @ApiProperty({ example: 5, type: Number })
     readonly rating: number | undefined;
-
-    @Matches(/^DRUCKAUSGABE$|^KINDLE$/u)
-    @IsOptional()
-    @ApiProperty({ example: 'DRUCKAUSGABE', type: String })
-    readonly art: BuchArt | undefined;
 
     @IsPositive()
     @ApiProperty({ example: 1, type: Number })
@@ -75,30 +62,38 @@ export class BuchDtoOhneRef {
     @ApiProperty({ example: 0.1, type: Number })
     readonly rabatt: number | undefined;
 
-    @IsBoolean()
-    @ApiProperty({ example: true, type: Boolean })
-    readonly lieferbar: boolean | undefined;
-
     @IsISO8601({ strict: true })
     @IsOptional()
     @ApiProperty({ example: '2021-01-31' })
     readonly datum: Date | string | undefined;
 
-    @IsUrl()
     @IsOptional()
-    @ApiProperty({ example: 'https://test.de/', type: String })
-    readonly homepage: string | undefined;
+    @ApiProperty({ example: '1234567890000', type: String})
+    readonly barcode: string | undefined;
+
+    @Min(1)
+    @ApiProperty({ example: 1, type: Number})
+    readonly fassung: number | undefined;
 
     @IsOptional()
-    @ArrayUnique()
-    @ApiProperty({ example: ['JAVASCRIPT', 'TYPESCRIPT'] })
-    readonly schlagwoerter: string[] | undefined;
+    @ApiProperty({ example: 'Horror', type: String})
+    readonly genre: string[] | undefined;
+
+    @IsOptional()
+    @ApiProperty({ example: 'BLUERAY', type: String })
+    readonly filmart: FilmArt | undefined;
+    
+    @IsISO8601({ strict: true })
+    @IsOptional()
+    @ApiProperty({ example: '2021-01-31' })
+    readonly release: Date | string | undefined;
+
 }
 
 /**
- * Entity-Klasse für Bücher ohne TypeORM.
+ * Entity-Klasse für Filme ohne TypeORM.
  */
-export class BuchDTO extends BuchDtoOhneRef {
+export class FilmDTO extends FilmDtoOhneRef {
     @ValidateNested()
     @Type(() => TitelDTO)
     @ApiProperty({ type: TitelDTO })
@@ -113,4 +108,4 @@ export class BuchDTO extends BuchDtoOhneRef {
 
     // AbbildungDTO
 }
-/* eslint-enable max-classes-per-file, @typescript-eslint/no-magic-numbers */
+/* eslint-enable max-classes-per-file */

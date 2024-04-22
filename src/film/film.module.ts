@@ -14,12 +14,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { BuchGetController } from './rest/buch-get.controller.js';
-import { BuchMutationResolver } from './graphql/film-mutation.resolver.js';
-import { BuchQueryResolver } from './graphql/film-query.resolver.js';
-import { BuchReadService } from './service/buch-read.service.js';
-import { BuchWriteController } from './rest/buch-write.controller.js';
-import { BuchWriteService } from './service/buch-write.service.js';
+import { FilmGetController } from './rest/film-get.controller.js';
+import { FilmMutationResolver } from './graphql/film-mutation.resolver.js';
+import { FilmQueryResolver } from './graphql/film-query.resolver.js';
+import { FilmReadService } from './service/film-read.service.js';
+import { FilmWriteController } from './rest/film-write.controller.js';
+import { FilmWriteService } from './service/film-write.service.js';
 import { KeycloakModule } from '../security/keycloak/keycloak.module.js';
 import { MailModule } from '../mail/mail.module.js';
 import { Module } from '@nestjs/common';
@@ -39,16 +39,16 @@ import { entities } from './entity/entities.js';
  */
 @Module({
     imports: [KeycloakModule, MailModule, TypeOrmModule.forFeature(entities)],
-    controllers: [BuchGetController, BuchWriteController],
+    controllers: [FilmGetController, FilmWriteController],
     // Provider sind z.B. Service-Klassen fuer DI
     providers: [
-        BuchReadService,
-        BuchWriteService,
-        BuchQueryResolver,
-        BuchMutationResolver,
+        FilmReadService,
+        FilmWriteService,
+        FilmQueryResolver,
+        FilmMutationResolver,
         QueryBuilder,
     ],
     // Export der Provider fuer DI in anderen Modulen
-    exports: [BuchReadService, BuchWriteService],
+    exports: [FilmReadService, FilmWriteService],
 })
-export class BuchModule {}
+export class FilmModule {}

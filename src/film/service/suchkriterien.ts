@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-magic-numbers */
 /*
- * Copyright (C) 2023 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
+ * Copyright (C) 2016 - present Juergen Zimmermann, Hochschule Karlsruhe
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +16,23 @@
  */
 
 /**
- * Das Modul besteht aus der Entity-Klasse.
+ * Das Modul besteht aus der Klasse {@linkcode FilmReadService}.
  * @packageDocumentation
  */
-/*
-Test
-*/
-import { ApiProperty } from '@nestjs/swagger';
-import { MaxLength } from 'class-validator';
+
+import { type FilmArt } from './../entity/film.entity.js';
 
 /**
- * Entity-Klasse für Abbildung ohne TypeORM.
+ * Typdefinition für `FilmReadService.find()`und `QueryBuilder.build()`
  */
-export class AbbildungDTO {
-    @MaxLength(32)
-    @ApiProperty({ example: 'Die Beschriftung', type: String })
-    readonly beschriftung!: string;
-
-    @MaxLength(16)
-    @ApiProperty({ example: 'image/png', type: String })
-    readonly contentType!: string;
+export interface Suchkriterien {
+    readonly barcode?: string;
+    readonly rating?: number;
+    readonly filmart?: FilmArt;
+    readonly preis?: number;
+    readonly rabatt?: number;
+    readonly release?: string;
+    readonly action?: string;
+    readonly comedy?: string;
+    readonly titel?: string;
 }
-/* eslint-enable @typescript-eslint/no-magic-numbers */
