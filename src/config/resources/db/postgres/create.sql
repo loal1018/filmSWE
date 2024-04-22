@@ -26,60 +26,56 @@
 -- https://www.postgresql.org/docs/current/ddl-schemas.html
 -- https://www.postgresql.org/docs/current/ddl-schemas.html#DDL-SCHEMAS-CREATE
 -- "user-private schema" (Default-Schema: public)
-CREATE SCHEMA IF NOT EXISTS AUTHORIZATION buch;
+CREATE SCHEMA IF NOT EXISTS AUTHORIZATION film;
 
-ALTER ROLE buch SET search_path = 'buch';
+ALTER ROLE film SET search_path = 'film';
 
 -- https://www.postgresql.org/docs/current/sql-createtype.html
 -- https://www.postgresql.org/docs/current/datatype-enum.html
-CREATE TYPE buchart AS ENUM ('DRUCKAUSGABE', 'KINDLE');
+CREATE TYPE filmart AS ENUM ('DVD', 'BLUERAY');
 
 -- https://www.postgresql.org/docs/current/sql-createtable.html
 -- https://www.postgresql.org/docs/current/datatype.html
-CREATE TABLE IF NOT EXISTS buch (
+CREATE TABLE IF NOT EXISTS film (
                   -- https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-INT
                   -- https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-PRIMARY-KEYS
                   -- impliziter Index fuer Primary Key
                   -- "GENERATED ALWAYS AS IDENTITY" gemaess SQL-Standard
                   -- entspricht SERIAL mit generierter Sequenz buch_id_seq
-    id            integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE buchspace,
+    id            integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE filmspace,
                   -- https://www.postgresql.org/docs/current/ddl-constraints.html#id-1.5.4.6.6
-    version       integer NOT NULL DEFAULT 0,
+    fassung       integer NOT NULL DEFAULT 0,
                   -- impliziter Index als B-Baum durch UNIQUE
                   -- https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS
-    isbn          varchar(17) NOT NULL UNIQUE USING INDEX TABLESPACE buchspace,
                   -- https://www.postgresql.org/docs/current/ddl-constraints.html#DDL-CONSTRAINTS-CHECK-CONSTRAINTS
-                  -- https://www.postgresql.org/docs/current/functions-matching.html#FUNCTIONS-POSIX-REGEXP
+    barcode       varchar(64),
+                  -- https://www.postgresql.org/docs/current/datatype-datetime.html
     rating        integer NOT NULL CHECK (rating >= 0 AND rating <= 5),
-    art           buchart,
+    filmart           filmart,
                   -- https://www.postgresql.org/docs/current/datatype-numeric.html#DATATYPE-NUMERIC-DECIMAL
                   -- 10 Stellen, davon 2 Nachkommastellen
     preis         decimal(8,2) NOT NULL,
-    rabatt        decimal(4,3) NOT NULL,
                   -- https://www.postgresql.org/docs/current/datatype-boolean.html
-    lieferbar     boolean NOT NULL DEFAULT FALSE,
-                  -- https://www.postgresql.org/docs/current/datatype-datetime.html
-    datum         date,
-    homepage      varchar(40),
+    release       date,
+    genre         varchar(40),
     -- schlagwoerter json,
-    schlagwoerter varchar(64),
-                  -- https://www.postgresql.org/docs/current/datatype-datetime.html
+    
     erzeugt       timestamp NOT NULL DEFAULT NOW(),
     aktualisiert  timestamp NOT NULL DEFAULT NOW()
-) TABLESPACE buchspace;
+) TABLESPACE filmspace;
 
 CREATE TABLE IF NOT EXISTS titel (
-    id          integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE buchspace,
+    id          integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE filmspace,
     titel       varchar(40) NOT NULL,
     untertitel  varchar(40),
-    buch_id     integer NOT NULL UNIQUE USING INDEX TABLESPACE buchspace REFERENCES buch
-) TABLESPACE buchspace;
+    film_id     integer NOT NULL UNIQUE USING INDEX TABLESPACE filmspace REFERENCES film
+) TABLESPACE filmspace;
 
 
 CREATE TABLE IF NOT EXISTS abbildung (
-    id              integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE buchspace,
+    id              integer GENERATED ALWAYS AS IDENTITY(START WITH 1000) PRIMARY KEY USING INDEX TABLESPACE filmspace,
     beschriftung    varchar(32) NOT NULL,
     content_type    varchar(16) NOT NULL,
-    buch_id         integer NOT NULL REFERENCES buch
-) TABLESPACE buchspace;
-CREATE INDEX IF NOT EXISTS abbildung_buch_id_idx ON abbildung(buch_id) TABLESPACE buchspace;
+    film_id         integer NOT NULL REFERENCES film
+) TABLESPACE filmspace;
+CREATE INDEX IF NOT EXISTS abbildung_film_id_idx ON abbildung(film_id) TABLESPACE filmspace;

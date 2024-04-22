@@ -245,7 +245,7 @@ export class FilmWriteController {
             erzeugt: new Date(),
             aktualisiert: new Date(),
         };
-    
+
         // Rueckwaertsverweise
         film.titel.film = film;
         film.abbildungen?.forEach((abbildung) => {
