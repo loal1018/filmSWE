@@ -24,8 +24,8 @@ import {
     shutdownServer,
     startServer,
 } from '../testserver.js';
-import { type BuchDTO } from '../../src/buch/rest/buchDTO.entity.js';
-import { BuchReadService } from '../../src/buch/service/buch-read.service.js';
+import { type FilmDTO } from '../../src/film/rest/filmDTO.entity.js';
+import { FilmhReadService } from '../../src/film/service/film-read.service.js';
 import { type ErrorResponse } from './error-response.js';
 import { HttpStatus } from '@nestjs/common';
 import { loginRest } from '../login.js';
@@ -33,19 +33,16 @@ import { loginRest } from '../login.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const neuesBuch: BuchDTO = {
-    isbn: '978-0-007-00644-1',
+const neuerFilm: FilmDTO = {
+    barcode: "4-011470212981",
     rating: 1,
-    art: 'DRUCKAUSGABE',
+    filmart: "BLUERAY",
     preis: 99.99,
-    rabatt: 0.123,
-    lieferbar: true,
-    datum: '2022-02-28',
-    homepage: 'https://post.rest',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
+    release: "2022-02-28",
+    genre: ["HORROR", "THRILLER"],
     titel: {
-        titel: 'Titelpost',
-        untertitel: 'untertitelpos',
+        titel: "TheShining",
+        untertitel: "untertitelTheShining"
     },
     abbildungen: [
         {
@@ -54,33 +51,27 @@ const neuesBuch: BuchDTO = {
         },
     ],
 };
-const neuesBuchInvalid: Record<string, unknown> = {
-    isbn: 'falsche-ISBN',
+const neuerFilmInvalid: Record<string, unknown> = {
+    barcode: 'falscher-barcode',
     rating: -1,
-    art: 'UNSICHTBAR',
+    filmart: 'UNSICHTBAR',
     preis: -1,
-    rabatt: 2,
-    lieferbar: true,
-    datum: '12345-123-123',
-    homepage: 'anyHomepage',
+    release: '12345-123-123',
     titel: {
         titel: '?!',
         untertitel: 'Untertitelinvalid',
     },
 };
-const neuesBuchIsbnExistiert: BuchDTO = {
-    isbn: '978-3-897-22583-1',
+const neuerFilmBarcodeExistiert: FilmDTO = {
+    barcode: '4-011470212981',
     rating: 1,
-    art: 'DRUCKAUSGABE',
-    preis: 99.99,
-    rabatt: 0.099,
-    lieferbar: true,
-    datum: '2022-02-28',
-    homepage: 'https://post.isbn/',
-    schlagwoerter: ['JAVASCRIPT', 'TYPESCRIPT'],
+    filmart: 'BLUERAY',
+    preis: 99.99,,
+    release: '2022-02-28',
+    schlagwoerter: ['HORROR', 'THRILLER'],
     titel: {
-        titel: 'Titelpostisbn',
-        untertitel: 'Untertitelpostisbn',
+        titel: 'Titelpostbarcode',
+        untertitel: 'Untertitelpostbarcode',
     },
     abbildungen: undefined,
 };
@@ -111,7 +102,7 @@ describe('POST /rest', () => {
         await shutdownServer();
     });
 
-    test('Neues Buch', async () => {
+    test('Neues Film', async () => {
         // given
         const token = await loginRest(client);
         headers.Authorization = `Bearer ${token}`;
@@ -119,7 +110,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<string> = await client.post(
             '/rest',
-            neuesBuch,
+            neuerFilm,
             { headers },
         );
 
@@ -140,30 +131,29 @@ describe('POST /rest', () => {
         const idStr = location.slice(indexLastSlash + 1);
 
         expect(idStr).toBeDefined();
-        expect(BuchReadService.ID_PATTERN.test(idStr)).toBe(true);
+        expect(FilmReadService.ID_PATTERN.test(idStr)).toBe(true);
 
         expect(data).toBe('');
     });
 
-    test('Neues Buch mit ungueltigen Daten', async () => {
+    test('Neuer Film mit ungueltigen Daten', async () => {
         // given
         const token = await loginRest(client);
         headers.Authorization = `Bearer ${token}`;
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
+            expect.stringMatching(/^barcode /u),
             expect.stringMatching(/^rating /u),
-            expect.stringMatching(/^art /u),
+            expect.stringMatching(/^filmart /u),
             expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
+            expect.stringMatching(/^release /u),
+            expect.stringMatching(/^genre /u),
             expect.stringMatching(/^titel.titel /u),
         ];
 
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesBuchInvalid,
+            neuerFilmInvalid,
             { headers },
         );
 
@@ -180,7 +170,7 @@ describe('POST /rest', () => {
         expect(messages).toEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test('Neues Buch, aber die ISBN existiert bereits', async () => {
+    test('Neuer Film, aber der Barcode existiert bereits', async () => {
         // given
         const token = await loginRest(client);
         headers.Authorization = `Bearer ${token}`;
@@ -188,7 +178,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<ErrorResponse> = await client.post(
             '/rest',
-            neuesBuchIsbnExistiert,
+            neuerFilmBarcodeExistiert,
             { headers },
         );
 
@@ -197,22 +187,22 @@ describe('POST /rest', () => {
 
         const { message, statusCode } = data;
 
-        expect(message).toEqual(expect.stringContaining('ISBN'));
+        expect(message).toEqual(expect.stringContaining('BARCODE'));
         expect(statusCode).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
     });
 
-    test('Neues Buch, aber ohne Token', async () => {
+    test('Neuer Film, aber ohne Token', async () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesBuch,
+            neuerFilm,
         );
 
         // then
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Neues Buch, aber mit falschem Token', async () => {
+    test('Neuer Film, aber mit falschem Token', async () => {
         // given
         const token = 'FALSCH';
         headers.Authorization = `Bearer ${token}`;
@@ -220,7 +210,7 @@ describe('POST /rest', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.post(
             '/rest',
-            neuesBuch,
+            neuerFilm,
             { headers },
         );
 
