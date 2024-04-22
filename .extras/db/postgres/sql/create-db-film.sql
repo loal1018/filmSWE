@@ -30,7 +30,7 @@
 --     cd .extras\compose\db\postgres
 --     docker compose exec db bash
 --        chown postgres:postgres /var/lib/postgresql/tablespace
---        chown postgres:postgres /var/lib/postgresql/tablespace/buch
+--        chown postgres:postgres /var/lib/postgresql/tablespace/film
 --        chown postgres:postgres /var/lib/postgresql/key.pem
 --        chown postgres:postgres /var/lib/postgresql/certificate.crt
 --        chmod 400 /var/lib/postgresql/key.pem
@@ -46,8 +46,8 @@
 --     docker compose up db
 -- (5) 2. PowerShell:
 --     docker compose exec db bash
---        psql --dbname=postgres --username=postgres --file=/sql/create-db-buch.sql
---        psql --dbname=buch --username=buch --file=/sql/create-schema-buch.sql
+--        psql --dbname=postgres --username=postgres --file=/sql/create-db-film.sql
+--        psql --dbname=film --username=film --file=/sql/create-schema-film.sql
 --        exit
 --      docker compose down
 
