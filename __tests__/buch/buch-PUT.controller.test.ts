@@ -24,7 +24,7 @@ import {
     shutdownServer,
     startServer,
 } from '../testserver.js';
-import { type BuchDtoOhneRef } from '../../src/buch/rest/buchDTO.entity.js';
+import { type FilmDtoOhneRef } from '../../src/film/rest/filmDTO.entity.js';
 import { type ErrorResponse } from './error-response.js';
 import { HttpStatus } from '@nestjs/common';
 import { loginRest } from '../login.js';
@@ -32,54 +32,42 @@ import { loginRest } from '../login.js';
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const geaendertesBuch: BuchDtoOhneRef = {
-    isbn: '978-0-201-63361-0',
-    rating: 5,
-    art: 'KINDLE',
-    preis: 3333,
-    rabatt: 0.33,
-    lieferbar: true,
-    datum: '2022-03-03',
-    homepage: 'https://geaendert.put.rest',
-    schlagwoerter: ['JAVASCRIPT'],
+const geaenderterFilm: FilmDtoOhneRef = {
+    barcode: "4-011470212981",
+    rating: 1,
+    filmart: 'BLUERAY',
+    preis: 99.99,
+    release: "2022-02-28",
+    genre: ["HORROR", "THRILLER"],
 };
 const idVorhanden = '30';
 
-const geaendertesBuchIdNichtVorhanden: BuchDtoOhneRef = {
-    isbn: '978-0-007-09732-6',
+const geaenderterFilmIdNichtVorhanden: FilmDtoOhneRef = {
+    barcode: "4-011470212981",
     rating: 4,
-    art: 'DRUCKAUSGABE',
+    filmart: 'BLUERAY',
     preis: 44.4,
-    rabatt: 0.044,
-    lieferbar: true,
-    datum: '2022-02-04',
-    homepage: 'https://acme.de',
-    schlagwoerter: ['JAVASCRIPT'],
+    release: '2022-02-04',
+    schlagwoerter: ['COMEDY'],
 };
 const idNichtVorhanden = '999999';
 
-const geaendertesBuchInvalid: Record<string, unknown> = {
-    isbn: 'falsche-ISBN',
+const geaenderterFilmInvalid: Record<string, unknown> = {
+    barcode: 'falscher-Barcode',
     rating: -1,
-    art: 'UNSICHTBAR',
+    filmart: 'UNSICHTBAR',
     preis: -1,
-    rabatt: 2,
-    lieferbar: true,
-    datum: '12345-123-123',
+    release: '12345-123-123',
     titel: '?!',
-    homepage: 'anyHomepage',
 };
 
-const veraltesBuch: BuchDtoOhneRef = {
-    isbn: '978-0-007-09732-6',
+const veralterFilm: FilmDtoOhneRef = {
+    barcode: '8-011470212981',
     rating: 1,
-    art: 'DRUCKAUSGABE',
+    filmart: 'DVD',
     preis: 44.4,
-    rabatt: 0.044,
-    lieferbar: true,
-    datum: '2022-02-04',
-    homepage: 'https://acme.de',
-    schlagwoerter: ['JAVASCRIPT'],
+    release: '2022-02-04',
+    schlagwoerter: ['COMEDY'],
 };
 
 // -----------------------------------------------------------------------------
@@ -109,7 +97,7 @@ describe('PUT /rest/:id', () => {
         await shutdownServer();
     });
 
-    test('Vorhandenes Buch aendern', async () => {
+    test('Vorhandener Film aendern', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
@@ -119,7 +107,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesBuch,
+            geaenderterFilm,
             { headers },
         );
 
@@ -128,7 +116,7 @@ describe('PUT /rest/:id', () => {
         expect(data).toBe('');
     });
 
-    test('Nicht-vorhandenes Buch aendern', async () => {
+    test('Nicht-vorhandener Film aendern', async () => {
         // given
         const url = `/rest/${idNichtVorhanden}`;
         const token = await loginRest(client);
@@ -138,7 +126,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesBuchIdNichtVorhanden,
+            geaenderterFilmIdNichtVorhanden,
             { headers },
         );
 
@@ -146,25 +134,24 @@ describe('PUT /rest/:id', () => {
         expect(status).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Vorhandenes Buch aendern, aber mit ungueltigen Daten', async () => {
+    test('Vorhandener Film aendern, aber mit ungueltigen Daten', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
         headers.Authorization = `Bearer ${token}`;
         headers['If-Match'] = '"0"';
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
+            expect.stringMatching(/^barcode /u),
             expect.stringMatching(/^rating /u),
-            expect.stringMatching(/^art /u),
+            expect.stringMatching(/^filmart /u),
             expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
+            expect.stringMatching(/^release /u),
+            expect.stringMatching(/^genre /u),
         ];
 
         // when
         const { status, data }: AxiosResponse<Record<string, any>> =
-            await client.put(url, geaendertesBuchInvalid, { headers });
+            await client.put(url, geaenderterFilmInvalid, { headers });
 
         // then
         expect(status).toBe(HttpStatus.UNPROCESSABLE_ENTITY);
@@ -177,7 +164,7 @@ describe('PUT /rest/:id', () => {
         expect(messages).toEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test('Vorhandenes Buch aendern, aber ohne Versionsnummer', async () => {
+    test('Vorhandener Film aendern, aber ohne Versionsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
@@ -187,7 +174,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<string> = await client.put(
             url,
-            geaendertesBuch,
+            geaenderterFilm,
             { headers },
         );
 
@@ -196,7 +183,7 @@ describe('PUT /rest/:id', () => {
         expect(data).toBe('Header "If-Match" fehlt');
     });
 
-    test('Vorhandenes Buch aendern, aber mit alter Versionsnummer', async () => {
+    test('Vorhandener Film aendern, aber mit alter Versionsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
@@ -206,7 +193,7 @@ describe('PUT /rest/:id', () => {
         // when
         const { status, data }: AxiosResponse<ErrorResponse> = await client.put(
             url,
-            veraltesBuch,
+            veralterFilm,
             { headers },
         );
 
@@ -219,7 +206,7 @@ describe('PUT /rest/:id', () => {
         expect(statusCode).toBe(HttpStatus.PRECONDITION_FAILED);
     });
 
-    test('Vorhandenes Buch aendern, aber ohne Token', async () => {
+    test('Vorhandener Film aendern, aber ohne Token', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         delete headers.Authorization;
@@ -228,7 +215,7 @@ describe('PUT /rest/:id', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.put(
             url,
-            geaendertesBuch,
+            geaenderterFilm,
             { headers },
         );
 
@@ -236,7 +223,7 @@ describe('PUT /rest/:id', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Vorhandenes Buch aendern, aber mit falschem Token', async () => {
+    test('Vorhandener Film aendern, aber mit falschem Token', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = 'FALSCH';
@@ -245,7 +232,7 @@ describe('PUT /rest/:id', () => {
         // when
         const response: AxiosResponse<Record<string, any>> = await client.put(
             url,
-            geaendertesBuch,
+            geaenderterFilm,
             { headers },
         );
 
