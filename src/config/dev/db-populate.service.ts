@@ -43,7 +43,7 @@ import { resolve } from 'node:path';
  */
 @Injectable()
 export class DbPopulateService implements OnApplicationBootstrap {
-    readonly #tabellen = ['buch', 'titel', 'abbildung'];
+    readonly #tabellen = ['film', 'titel', 'abbildung'];
 
     readonly #datasource: DataSource;
 
@@ -55,21 +55,18 @@ export class DbPopulateService implements OnApplicationBootstrap {
     // https://docs.oracle.com/en/database/oracle/oracle-database/23/admin/managing-tables.html#GUID-2A801016-0399-4925-AD1B-A02683E81B59
     // https://docs.oracle.com/en/database/oracle/oracle-database/23/sutil/using-oracle-external-tables-examples.html
     // https://docs.oracle.com/en/database/oracle/oracle-database/23/sutil/oracle-sql-loader-commands.html
-    readonly #oracleInsertBuch = `
-        INSERT INTO buch(id,version,isbn,rating,art,preis,rabatt,lieferbar,datum,homepage,schlagwoerter,erzeugt,aktualisiert)
-        SELECT id,version,isbn,rating,art,preis,rabatt,lieferbar,datum,homepage,schlagwoerter,erzeugt,aktualisiert
+    readonly #oracleInsertFilm = `
+        INSERT INTO film(id,fassung,barcode,rating,filmart,preis,release,genre,erzeugt,aktualisiert)
+        SELECT id,fassung,barcode,rating,filmart,preis,release,genre,erzeugt,aktualisiert
         FROM   EXTERNAL (
             (id            NUMBER(10,0),
-            version       NUMBER(3,0),
-            isbn          VARCHAR2(17),
+            fassung       NUMBER(3,0),
+            barcode          VARCHAR2(17),
             rating        NUMBER(1,0),
-            art           VARCHAR2(12),
+            filmart           VARCHAR2(12),
             preis         NUMBER(8,2),
-            rabatt        NUMBER(4,3),
-            lieferbar     NUMBER(1,0),
-            datum         DATE,
-            homepage      VARCHAR2(40),
-            schlagwoerter VARCHAR2(64),
+            release         DATE,
+            genre VARCHAR2(64),
             erzeugt       TIMESTAMP,
             aktualisiert  TIMESTAMP)
             TYPE ORACLE_LOADER
@@ -78,25 +75,25 @@ export class DbPopulateService implements OnApplicationBootstrap {
                 RECORDS DELIMITED BY NEWLINE
                 SKIP 1
                 FIELDS TERMINATED BY ';'
-                (id,version,isbn,rating,art,preis,rabatt,lieferbar,
-                 datum DATE 'YYYY-MM-DD',
-                 homepage,schlagwoerter,
+                (id,fassung,barcode,rating,filmart,preis,
+                 release DATE 'YYYY-MM-DD',
+                 genre,
                  erzeugt CHAR(19) date_format TIMESTAMP mask 'YYYY-MM-DD HH24:MI:SS',
                  aktualisiert CHAR(19) date_format TIMESTAMP mask 'YYYY-MM-DD HH24:MI:SS')
             )
-            LOCATION ('buch.csv')
+            LOCATION ('film.csv')
             REJECT LIMIT UNLIMITED
-        ) buch_external
+        ) film_external
     `;
 
     readonly #oracleInsertTitel = `
-        INSERT INTO titel(id,titel,untertitel,buch_id)
-        SELECT id,titel,untertitel,buch_id
+        INSERT INTO titel(id,titel,untertitel,film_id)
+        SELECT id,titel,untertitel,film_id
         FROM   EXTERNAL (
             (id         NUMBER(10,0),
             titel       VARCHAR2(40),
             untertitel  VARCHAR2(40),
-            buch_id     NUMBER(10,0))
+            film_id     NUMBER(10,0))
             TYPE ORACLE_LOADER
             DEFAULT DIRECTORY csv_dir
             ACCESS PARAMETERS (
@@ -109,13 +106,13 @@ export class DbPopulateService implements OnApplicationBootstrap {
     `;
 
     readonly #oracleInsertAbbildung = `
-        INSERT INTO abbildung(id,beschriftung,content_type,buch_id)
-        SELECT id,beschriftung,content_type,buch_id
+        INSERT INTO abbildung(id,beschriftung,content_type,film_id)
+        SELECT id,beschriftung,content_type,film_id
         FROM   EXTERNAL (
             (id         NUMBER(10,0),
             beschriftung VARCHAR2(32),
             content_type VARCHAR2(16),
-            buch_id     NUMBER(10,0))
+            film_id     NUMBER(10,0))
             TYPE ORACLE_LOADER
             DEFAULT DIRECTORY csv_dir
             ACCESS PARAMETERS (
@@ -240,7 +237,7 @@ export class DbPopulateService implements OnApplicationBootstrap {
         this.#logger.debug('createScript = %s', createScript);
         await this.#executeStatements(createScript, true);
 
-        await this.#oracleInsert(this.#oracleInsertBuch);
+        await this.#oracleInsert(this.#oracleInsertFilm);
         await this.#oracleInsert(this.#oracleInsertTitel);
         await this.#oracleInsert(this.#oracleInsertAbbildung);
     }

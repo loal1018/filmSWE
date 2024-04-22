@@ -22,9 +22,9 @@ import {
 import { AdminModule } from './admin/admin.module.js';
 import { type ApolloDriverConfig } from '@nestjs/apollo';
 import { DevModule } from './config/dev/dev.module.js';
-import { FilmGetController } from './buch/rest/film-get.controller.js';
-import { FilmModule } from './buch/film.module.js';
-import { FilmWriteController } from './buch/rest/film-write.controller.js';
+import { FilmGetController } from './film/rest/film-get.controller.js';
+import { FilmModule } from './film/film.module.js';
+import { FilmWriteController } from './film/rest/film-write.controller.js';
 import { GraphQLModule } from '@nestjs/graphql';
 import { KeycloakModule } from './security/keycloak/keycloak.module.js';
 import { LoggerModule } from './logger/logger.module.js';

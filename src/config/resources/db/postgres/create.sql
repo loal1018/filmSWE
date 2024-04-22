@@ -32,7 +32,7 @@ ALTER ROLE film SET search_path = 'film';
 
 -- https://www.postgresql.org/docs/current/sql-createtype.html
 -- https://www.postgresql.org/docs/current/datatype-enum.html
-CREATE TYPE filmart AS ENUM ('DVD', 'BLUERAY');
+CREATE TYPE filmart AS ENUM ('DVD', 'BLURAY');
 
 -- https://www.postgresql.org/docs/current/sql-createtable.html
 -- https://www.postgresql.org/docs/current/datatype.html

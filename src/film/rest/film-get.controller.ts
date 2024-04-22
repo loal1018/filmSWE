@@ -1,8 +1,5 @@
 /* eslint-disable @eslint-community/eslint-comments/disable-enable-pair */
 /* eslint-disable sort-imports */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable max-lines */
 /*
  * Copyright (C) 2021 - present Juergen Zimmermann, Hochschule Karlsruhe
@@ -37,7 +34,7 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger';
-import { type Film, type FilmArt } from '../entity/film.entity.js';
+import { type Film } from '../entity/film.entity.js';
 import {
     Controller,
     Get,

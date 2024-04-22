@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { BadUserInputError } from '../../buch/graphql/errors.js';
+import { BadUserInputError } from '../../film/graphql/errors.js';
 import { KeycloakService } from './keycloak.service.js';
 import { Public } from 'nest-keycloak-connect';
 import { ResponseTimeInterceptor } from '../../logger/response-time.interceptor.js';

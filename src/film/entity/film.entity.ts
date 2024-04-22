@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2016 - present Juergen Zimmermann, Florian Goebel, Hochschule Karlsruhe
  *
@@ -59,7 +58,7 @@ import { dbType } from '../../config/db.js';
 /**
  * Alias-Typ für gültige Strings bei der Art eines Buches.
  */
-export type FilmArt = 'DVD' | 'BLUERAY';
+export type FilmArt = 'DVD' | 'BLURAY';
 
 /**
  * Entity-Klasse zu einem relationalen Tabelle
@@ -77,14 +76,14 @@ export class Film {
 
     @Column()
     @ApiProperty({ example: '4-011470212981', type: String })
-    readonly barcode!: string | undefined;
+    readonly barcode!: string;
 
     @Column('int')
     @ApiProperty({ example: 5, type: Number })
     readonly rating: number | undefined;
 
     @Column('varchar')
-    @ApiProperty({ example: 'BLUERAY', type: String })
+    @ApiProperty({ example: 'BLURAY', type: String })
     readonly filmart: FilmArt | undefined;
 
     @Column('decimal', {
@@ -101,7 +100,6 @@ export class Film {
         scale: 3,
         transformer: new DecimalTransformer(),
     })
-
     @Column('date')
     @ApiProperty({ example: '2021-01-31' })
     // TypeORM unterstuetzt *NICHT* das Temporal-API (ES2022)

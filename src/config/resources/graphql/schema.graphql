@@ -22,7 +22,7 @@ schema {
 
 "Funktionen, um Filmdaten zu lesen"
 type Query {
-  buecher(suchkriterien: SuchkriterienInput): [Film!]
+  filme(suchkriterien: SuchkriterienInput): [Film!]
 
   film(id: ID!): Film
 }
@@ -56,34 +56,29 @@ type Abbildung {
 type Film {
   # ID ist bei Apollo ein String
   id: Int!
-  version: Int!
-  isbn: String!
+  fassung: Int!
+  barcode: String!
   rating: Int
-  art: Art
   preis: Float!
-  lieferbar: Boolean
-  datum: String
-  homepage: String
-  schlagwoerter: [String]
+  genre: [String]
+  filmart: Filmart
+  release: String
   # 1:1-Beziehung
   titel: Titel!
   # field mit @ResolveField
-  rabatt(short: Boolean): String!
 }
 
 "Enum-Typ für die Art eines Filmes"
-enum Art {
-  DRUCKAUSGABE
-  KINDLE
+enum Filmart {
+  DVD
+  BLURAY
 }
 
 "Suchkriterien für Filme"
 input SuchkriterienInput {
   titel: String
-  isbn: String
   rating: Int
-  art: Art
-  lieferbar: Boolean
+  filmart: Filmart
 }
 
 "Daten zum Titel eines neuen Filmes"
@@ -98,17 +93,16 @@ input AbbildungInput {
   contentType: String!
 }
 
-"Daten für ein neues Film"
+"Daten für ein neuen Film"
 input FilmInput {
-  isbn: String
+  fassung: Int
+  barcode: String
   rating: Int
-  art: Art
   preis: Float
-  rabatt: Float
-  lieferbar: Boolean
-  datum: String
-  homepage: String
-  schlagwoerter: [String]
+  genre: [String]
+  filmart: Filmart
+  release: String
+  # 1:1-Beziehung
   titel: TitelInput!
   abbildungen: [AbbildungInput!]
 }
@@ -117,19 +111,16 @@ type CreatePayload {
   id: Int
 }
 
-"Daten für ein zu änderndes Film"
+"Daten für ein zu ändernden Filmes"
 input FilmUpdateInput {
   id: ID
-  version: Int
-  isbn: String
+  fassung: Int
+  barcode: String
   rating: Int
-  art: Art
   preis: Float
-  rabatt: Float
-  lieferbar: Boolean
-  datum: String
-  homepage: String
-  schlagwoerter: [String]
+  genre: [String]
+  filmart: Filmart
+  release: String
 }
 
 type UpdatePayload {
