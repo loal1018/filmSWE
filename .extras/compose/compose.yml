@@ -14,8 +14,8 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # Aufruf:   docker compose [-f compose.yml -f compose.distroless.yml|compose.wolfi.yml] up
-#           docker compose exec buch bash   # Bookworm
-#           docker compose exec buch ash    # Wolfi
+#           docker compose exec film bash   # Bookworm
+#           docker compose exec film ash    # Wolfi
 #             id
 #             ps -ef                        # NUR Wolfi, NICHT Bookworm
 #             env
@@ -40,8 +40,8 @@ include:
 
 # https://docs.docker.com/compose/compose-file/05-services
 services:
-  buch:
-    image: juergenzimmermann/buch:2024.04.0-bookworm
+  film:
+    image: juergenzimmermann/film:2024.04.0-bookworm
     depends_on:
       db:
         condition: service_healthy
@@ -66,13 +66,13 @@ services:
         target: /opt/app/dist/config/resources/jwt/private-key.pem
         read_only: true
       - type: bind
-        source: ../../src/config/resources/db/sqlite/buch.sqlite
-        target: /opt/app/dist/config/resources/db/sqlite/buch.sqlite
+        source: ../../src/config/resources/db/sqlite/film.sqlite
+        target: /opt/app/dist/config/resources/db/sqlite/film.sqlite
     env_file: app.env
     environment:
       # https://docs.docker.com/compose/compose-file/compose-file-v3/#variable-substitution
       - USER_PASSWORD_ENCODED=$$argon2i$$v=19$$m=4096,t=3,p=1$$aaxA2v/9rRSPGkwYN+NQog$$27Huii1XtD3iEd62fog+04G26LRPZMHoYCI6AGKTL8M
-    #hostname: buch
+    #hostname: film
     cap_drop: [ALL]
     deploy:
       resources:

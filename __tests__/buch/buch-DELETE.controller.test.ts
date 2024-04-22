@@ -37,7 +37,7 @@ const id = '50';
 // -----------------------------------------------------------------------------
 // Test-Suite
 // eslint-disable-next-line max-lines-per-function
-describe('DELETE /rest/buecher', () => {
+describe('DELETE /rest/filme', () => {
     let client: AxiosInstance;
 
     // Testserver starten und dabei mit der DB verbinden
@@ -55,7 +55,7 @@ describe('DELETE /rest/buecher', () => {
         await shutdownServer();
     });
 
-    test('Vorhandenes Buch loeschen', async () => {
+    test('Vorhandener Film loeschen', async () => {
         // given
         const url = `/rest/${id}`;
         const token = await loginRest(client);
@@ -74,7 +74,7 @@ describe('DELETE /rest/buecher', () => {
         expect(data).toBeDefined();
     });
 
-    test('Buch loeschen, aber ohne Token', async () => {
+    test('Film loeschen, aber ohne Token', async () => {
         // given
         const url = `/rest/${id}`;
 
@@ -86,7 +86,7 @@ describe('DELETE /rest/buecher', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Buch loeschen, aber mit falschem Token', async () => {
+    test('Film loeschen, aber mit falschem Token', async () => {
         // given
         const url = `/rest/${id}`;
         const token = 'FALSCH';
@@ -102,7 +102,7 @@ describe('DELETE /rest/buecher', () => {
         expect(response.status).toBe(HttpStatus.UNAUTHORIZED);
     });
 
-    test('Vorhandenes Buch als "user" loeschen', async () => {
+    test('Vorhandener Film als "user" loeschen', async () => {
         // given
         const url = `/rest/60`;
         const token = await loginRest(client, 'user', 'p');

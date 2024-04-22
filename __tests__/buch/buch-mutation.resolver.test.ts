@@ -26,7 +26,7 @@ import {
     startServer,
 } from '../testserver.js';
 import { type GraphQLRequest } from '@apollo/server';
-import { type GraphQLResponseBody } from './buch-query.resolver.test.js';
+import { type GraphQLResponseBody } from './film-query.resolver.test.js';
 import { HttpStatus } from '@nestjs/common';
 import { loginGraphQL } from '../login.js';
 
@@ -62,7 +62,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Neues Buch', async () => {
+    test('Neuer Film', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -71,18 +71,15 @@ describe('GraphQL Mutations', () => {
                 mutation {
                     create(
                         input: {
-                            isbn: "978-0-321-19368-1",
+                            barcode: "4-011470212981",
                             rating: 1,
-                            art: KINDLE,
+                            filmart: BLUERAY,
                             preis: 99.99,
-                            rabatt: 0.123,
-                            lieferbar: true,
-                            datum: "2022-02-28",
-                            homepage: "https://create.mutation",
-                            schlagwoerter: ["JAVASCRIPT", "TYPESCRIPT"],
+                            release: "2022-02-28",
+                            genre: ["HORROR", "THRILLER"],
                             titel: {
-                                titel: "Titelcreatemutation",
-                                untertitel: "untertitelcreatemutation"
+                                titel: "TheShining",
+                                untertitel: "untertitelTheShining"
                             },
                             abbildungen: [{
                                 beschriftung: "Abb. 1",
@@ -114,7 +111,7 @@ describe('GraphQL Mutations', () => {
 
     // -------------------------------------------------------------------------
     // eslint-disable-next-line max-lines-per-function
-    test('Buch mit ungueltigen Werten neu anlegen', async () => {
+    test('Film mit ungueltigen Werten neu anlegen', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -123,14 +120,12 @@ describe('GraphQL Mutations', () => {
                 mutation {
                     create(
                         input: {
-                            isbn: "falsche-ISBN",
+                            barcode: "falscher-Barcode",
                             rating: -1,
-                            art: KINDLE,
+                            filmart: Zementblock,
                             preis: -1,
-                            rabatt: 2,
-                            lieferbar: false,
-                            datum: "12345-123-123",
-                            homepage: "anyHomepage",
+                            release: 2,
+                            genre: 8,
                             titel: {
                                 titel: "?!"
                             }
@@ -142,12 +137,12 @@ describe('GraphQL Mutations', () => {
             `,
         };
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
+            expect.stringMatching(/^barcode /u),
             expect.stringMatching(/^rating /u),
+            expect.stringMatching(/^filmart /u),
             expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
+            expect.stringMatching(/^release /u),
+            expect.stringMatching(/^genre /u),
             expect.stringMatching(/^titel.titel /u),
         ];
 
@@ -177,7 +172,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Buch aktualisieren', async () => {
+    test('Film aktualisieren', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -186,17 +181,12 @@ describe('GraphQL Mutations', () => {
                 mutation {
                     update(
                         input: {
-                            id: "40",
-                            version: 0,
-                            isbn: "978-0-007-09732-6",
-                            rating: 5,
-                            art: KINDLE,
-                            preis: 444.44,
-                            rabatt: 0.099,
-                            lieferbar: false,
-                            datum: "2021-04-04",
-                            homepage: "https://update.mutation"
-                            schlagwoerter: ["JAVASCRIPT", "TYPESCRIPT"],
+                            barcode: "5-122580212981",
+                            rating: 2,
+                            filmart: DVD,
+                            preis: 56.99,
+                            release: "2022-02-28",
+                            genre: ["HORROR", "THRILLER", "SCI-FI"],
                         }
                     ) {
                         version
@@ -221,7 +211,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Buch mit ungueltigen Werten aktualisieren', async () => {
+    test('Film mit ungueltigen Werten aktualisieren', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -233,15 +223,12 @@ describe('GraphQL Mutations', () => {
                         input: {
                             id: "${id}",
                             version: 0,
-                            isbn: "falsche-ISBN",
+                            barcode: "falscher-Barcode",
                             rating: -1,
-                            art: KINDLE,
+                            filmart: Zementblock,
                             preis: -1,
-                            rabatt: 2,
-                            lieferbar: false,
-                            datum: "12345-123-123",
-                            homepage: "anyHomepage",
-                            schlagwoerter: ["JAVASCRIPT", "TYPESCRIPT"]
+                            release: 2,
+                            genre: 8,       
                         }
                     ) {
                         version
@@ -250,12 +237,12 @@ describe('GraphQL Mutations', () => {
             `,
         };
         const expectedMsg = [
-            expect.stringMatching(/^isbn /u),
+            expect.stringMatching(/^barcode /u),
             expect.stringMatching(/^rating /u),
+            expect.stringMatching(/^filmart /u),
             expect.stringMatching(/^preis /u),
-            expect.stringMatching(/^rabatt /u),
-            expect.stringMatching(/^datum /u),
-            expect.stringMatching(/^homepage /u),
+            expect.stringMatching(/^release /u),
+            expect.stringMatching(/^genre /u),
         ];
 
         // when
@@ -281,7 +268,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Nicht-vorhandenes Buch aktualisieren', async () => {
+    test('Nicht-vorhandener Film aktualisieren', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -293,15 +280,12 @@ describe('GraphQL Mutations', () => {
                         input: {
                             id: "${id}",
                             version: 0,
-                            isbn: "978-0-007-09732-6",
-                            rating: 5,
-                            art: DRUCKAUSGABE,
+                            barcode: "4-011470212981",
+                            rating: 1,
+                            filmart: BLUERAY,
                             preis: 99.99,
-                            rabatt: 0.099,
-                            lieferbar: false,
-                            datum: "2021-01-02",
-                            homepage: "https://acme.com",
-                            schlagwoerter: ["JAVASCRIPT", "TYPESCRIPT"]
+                            release: "2022-02-28",
+                            genre: ["HORROR", "THRILLER"],
                         }
                     ) {
                         version
@@ -330,7 +314,7 @@ describe('GraphQL Mutations', () => {
         const { message, path, extensions } = error;
 
         expect(message).toBe(
-            `Es gibt kein Buch mit der ID ${id.toLowerCase()}.`,
+            `Es gibt keinen Film mit der ID ${id.toLowerCase()}.`,
         );
         expect(path).toBeDefined();
         expect(path![0]).toBe('update');
@@ -339,7 +323,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Buch loeschen', async () => {
+    test('Film loeschen', async () => {
         // given
         const token = await loginGraphQL(client);
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention
@@ -367,7 +351,7 @@ describe('GraphQL Mutations', () => {
     });
 
     // -------------------------------------------------------------------------
-    test('Buch loeschen als "user"', async () => {
+    test('Film loeschen als "user"', async () => {
         // given
         const token = await loginGraphQL(client, 'user', 'p');
         const authorization = { Authorization: `Bearer ${token}` }; // eslint-disable-line @typescript-eslint/naming-convention

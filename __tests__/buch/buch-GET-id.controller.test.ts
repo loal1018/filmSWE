@@ -42,7 +42,7 @@ import {
     shutdownServer,
     startServer,
 } from '../testserver.js';
-import { type BuchModel } from '../../src/buch/rest/buch-get.controller.js';
+import { type FilmModel } from '../../src/film/rest/film-get.controller.js';
 import { type ErrorResponse } from './error-response.js';
 import { HttpStatus } from '@nestjs/common';
 
@@ -77,12 +77,12 @@ describe('GET /rest/:id', () => {
         await shutdownServer();
     });
 
-    test('Buch zu vorhandener ID', async () => {
+    test('Film zu vorhandener ID', async () => {
         // given
         const url = `/${idVorhanden}`;
 
         // when
-        const { status, headers, data }: AxiosResponse<BuchModel> =
+        const { status, headers, data }: AxiosResponse<FilmModel> =
             await client.get(url);
 
         // then
@@ -96,7 +96,7 @@ describe('GET /rest/:id', () => {
         expect(selfLink).toMatch(new RegExp(`${url}$`, 'u'));
     });
 
-    test('Kein Buch zu nicht-vorhandener ID', async () => {
+    test('Kein Film zu nicht-vorhandener ID', async () => {
         // given
         const url = `/${idNichtVorhanden}`;
 
@@ -114,7 +114,7 @@ describe('GET /rest/:id', () => {
         expect(statusCode).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Kein Buch zu falscher ID', async () => {
+    test('Kein Film zu falscher ID', async () => {
         // given
         const url = `/${idFalsch}`;
 
@@ -131,7 +131,7 @@ describe('GET /rest/:id', () => {
         expect(statusCode).toBe(HttpStatus.NOT_FOUND);
     });
 
-    test('Buch zu vorhandener ID mit ETag', async () => {
+    test('Film zu vorhandener ID mit ETag', async () => {
         // given
         const url = `/${idVorhandenETag}`;
 
