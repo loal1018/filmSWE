@@ -64,7 +64,7 @@ services:
         # .s.PGSQL.5432.lock
         target: /var/run/postgresql
       - type: bind
-        source: C:/Zimmermann/volumes/postgres/csv/buch
+        source: C:/Zimmermann/volumes/postgres/csv/film 
         target: /csv
         read_only: true
       - type: bind
@@ -90,7 +90,7 @@ services:
     # https://docs.docker.com/compose/compose-file/compose-file-v3/#cap_add-cap_drop
     cap_drop: [ALL]
     # https://man7.org/linux/man-pages/man7/capabilities.7.html
-    #cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE, NET_BIND_SERVICE, CAP_FOWNER]
+    # cap_add: [CHOWN, SETGID, SETUID, DAC_OVERRIDE, NET_BIND_SERVICE, CAP_FOWNER]
     # https://docs.docker.com/compose/compose-file/deploy
     deploy:
       # https://docs.docker.com/compose/compose-file/deploy/#resources
