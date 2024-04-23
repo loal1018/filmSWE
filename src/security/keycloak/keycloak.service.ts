@@ -119,7 +119,7 @@ export class KeycloakService implements KeycloakConnectOptionsFactory {
     }
 
     // Extraktion der Rollen: wird auf Client-Seite benoetigt
-    // { ..., "azp": "buch-client", "exp": ..., "resource_access": { "buch-client": { "roles": ["admin"] } ...}
+    // { ..., "azp": "film-client", "exp": ..., "resource_access": { "film-client": { "roles": ["admin"] } ...}
     // azp = authorized party
     #logPayload(response: AxiosResponse<Record<string, string | number>>) {
         // https://www.keycloak.org/docs-api/23.0.6/rest-api/index.html#ClientInitialAccessCreatePresentation
