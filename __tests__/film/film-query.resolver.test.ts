@@ -38,12 +38,7 @@ export interface GraphQLResponseBody {
     errors?: readonly [GraphQLFormattedError];
 }
 
-type FilmDTO = Omit<
-    Film,
-    'abbildungen' | 'aktualisiert' | 'erzeugt'
-> & {
-
-};
+type FilmDTO = Omit<Film, 'abbildungen' | 'aktualisiert' | 'erzeugt'>;
 
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
@@ -91,7 +86,6 @@ describe('GraphQL Queries', () => {
             query: `
                 {
                     film(id: "${idVorhanden}") {
-                        version
                         id
                         fassung
                         barcode
@@ -122,7 +116,7 @@ describe('GraphQL Queries', () => {
         const result: FilmDTO = film;
 
         expect(result.titel?.titel).toMatch(/^\w/u);
-        expect(result.version).toBeGreaterThan(-1);
+        expect(result.fassung).toBeGreaterThan(-1);
         expect(result.id).toBeUndefined();
     });
 
