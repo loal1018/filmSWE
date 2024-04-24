@@ -151,7 +151,7 @@ export class FilmWriteService {
     async #validateCreate({ barcode }: Film): Promise<undefined> {
         this.#logger.debug('#validateCreate: isbn=%s', barcode);
         if (await this.#repo.existsBy({ barcode })) {
-            throw new IsbnExistsException(barcode!);
+            throw new IsbnExistsException(barcode);
         }
     }
 

@@ -24,9 +24,9 @@ import {
     shutdownServer,
     startServer,
 } from '../testserver.js';
+import { type ErrorResponse } from './error-response.js';
 import { type FilmDTO } from '../../src/film/rest/filmDTO.entity.js';
 import { FilmReadService } from '../../src/film/service/film-read.service.js';
-import { type ErrorResponse } from './error-response.js';
 import { HttpStatus } from '@nestjs/common';
 import { loginRest } from '../login.js';
 
@@ -34,16 +34,16 @@ import { loginRest } from '../login.js';
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
 const neuerFilm: FilmDTO = {
-    barcode: "4-011470212981",
+    barcode: '4-011470212981',
     rating: 1,
-    filmart: "BLURAY",
+    filmart: 'BLURAY',
     preis: 99.99,
-    release: "2022-02-28",
-    genre: ["HORROR", "THRILLER"],
+    release: '2022-02-28',
+    genre: ['HORROR', 'THRILLER'],
     fassung: 2,
     titel: {
-        titel: "TheShining",
-        untertitel: "untertitelTheShining"
+        titel: 'TheShining',
+        untertitel: 'untertitelTheShining',
     },
     abbildungen: [
         {
