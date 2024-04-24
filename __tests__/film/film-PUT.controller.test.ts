@@ -33,22 +33,24 @@ import { loginRest } from '../login.js';
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
 const geaenderterFilm: FilmDtoOhneRef = {
-    barcode: "4-011470212981",
+    barcode: '4-011470212981',
     rating: 1,
-    filmart: 'BLUERAY',
+    filmart: 'BLURAY',
     preis: 99.99,
-    release: "2022-02-28",
-    genre: ["HORROR", "THRILLER"],
+    release: '2022-02-28',
+    genre: ['HORROR', 'THRILLER'],
+    fassung: 2,
 };
 const idVorhanden = '30';
 
 const geaenderterFilmIdNichtVorhanden: FilmDtoOhneRef = {
-    barcode: "4-011470212981",
+    barcode: '4-011470212981',
     rating: 4,
-    filmart: 'BLUERAY',
+    filmart: 'BLURAY',
     preis: 44.4,
     release: '2022-02-04',
-    schlagwoerter: ['COMEDY'],
+    genre: ['COMEDY'],
+    fassung: 1,
 };
 const idNichtVorhanden = '999999';
 
@@ -59,6 +61,7 @@ const geaenderterFilmInvalid: Record<string, unknown> = {
     preis: -1,
     release: '12345-123-123',
     titel: '?!',
+    fassung: 1,
 };
 
 const veralterFilm: FilmDtoOhneRef = {
@@ -67,7 +70,8 @@ const veralterFilm: FilmDtoOhneRef = {
     filmart: 'DVD',
     preis: 44.4,
     release: '2022-02-04',
-    schlagwoerter: ['COMEDY'],
+    genre: ['COMEDY'],
+    fassung: 2,
 };
 
 // -----------------------------------------------------------------------------
