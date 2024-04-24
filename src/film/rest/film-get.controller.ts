@@ -122,9 +122,6 @@ export class FilmQuery implements Suchkriterien {
     declare readonly preis: number;
 
     @ApiProperty({ required: false })
-    declare readonly datum: string;
-
-    @ApiProperty({ required: false })
     declare readonly javascript: string;
 
     @ApiProperty({ required: false })

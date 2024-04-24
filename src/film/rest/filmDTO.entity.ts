@@ -54,17 +54,6 @@ export class FilmDtoOhneRef {
     // statt number ggf. Decimal aus decimal.js analog zu BigDecimal von Java
     readonly preis!: number;
 
-    @Min(0)
-    @Max(1)
-    @IsOptional()
-    @ApiProperty({ example: 0.1, type: Number })
-    readonly rabatt: number | undefined;
-
-    @IsISO8601({ strict: true })
-    @IsOptional()
-    @ApiProperty({ example: '2021-01-31' })
-    readonly datum: Date | string | undefined;
-
     @IsOptional()
     @ApiProperty({ example: '1234567890000', type: String })
     readonly barcode!: string;

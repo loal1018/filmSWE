@@ -40,6 +40,7 @@ const neuerFilm: FilmDTO = {
     preis: 99.99,
     release: "2022-02-28",
     genre: ["HORROR", "THRILLER"],
+    fassung: 2,
     titel: {
         titel: "TheShining",
         untertitel: "untertitelTheShining"
@@ -57,6 +58,7 @@ const neuerFilmInvalid: Record<string, unknown> = {
     filmart: 'UNSICHTBAR',
     preis: -1,
     release: '12345-123-123',
+    fassung: 1,
     titel: {
         titel: '?!',
         untertitel: 'Untertitelinvalid',
@@ -69,6 +71,7 @@ const neuerFilmBarcodeExistiert: FilmDTO = {
     preis: 99.99,
     release: '2022-02-28',
     genre: ['HORROR', 'THRILLER'],
+    fassung: 3,
     titel: {
         titel: 'Titelpostbarcode',
         untertitel: 'Untertitelpostbarcode',

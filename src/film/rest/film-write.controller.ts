@@ -232,7 +232,6 @@ export class FilmWriteController {
             barcode: filmDTO.barcode,
             rating: filmDTO.rating,
             preis: filmDTO.preis,
-            datum: filmDTO.datum,
             genre: filmDTO.genre,
             filmart: filmDTO.filmart,
             release: filmDTO.release,
