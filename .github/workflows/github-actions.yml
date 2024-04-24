@@ -1,0 +1,89 @@
+name: Build and Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    container:
+      image: node:20.11.0-bookworm
+      options: --publish 3000:3000 --publish 5000:5000
+      credentials:
+        username: root
+        password: root
+
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Delete Previous Build Artifacts
+        run: |
+          rm -rf src
+          rm -rf __tests__
+          rm -rf node_modules
+          rm -rf dist
+          rm -rf .extras/doc/api
+          rm -rf .extras/doc/folien/folien.html
+          rm -rf .extras/doc/projekthandbuch/html
+
+      - name: Install Dependencies
+        run: |
+          apt-get update -y
+          apt-get install -y gcc g++ make python3.11-minimal ca-certificates curl gnupg
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+          echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_20.x nodistro main" | tee /etc/apt/sources.list.d/nodesource.list
+          apt-get update
+          apt-get install -y nodejs
+          npm i -g npm
+          npm ci --no-fund --no-audit
+
+      - name: Compile
+        run: |
+          npx tsc --version
+          ./node_modules/.bin/tsc
+
+      - name: Test, Code Analysis, Security, Documentation
+        run: |
+          echo 'TODO: Configure DB server for tests'
+          npx eslint --version
+          npm run eslint
+          npm audit --omit=dev
+          npx asciidoctor --version
+          npm run asciidoctor
+          npx asciidoctor-revealjs --version
+          npm run revealjs
+          npx typedoc --version
+          npm run typedoc
+
+        # Post actions
+        post:
+          always:
+            - name: Publish HTML Reports
+              run: |
+                echo 'TODO: Publish HTML Reports'
+                # Logic for publishing HTML reports goes here
+
+            - name: Clean up artifacts
+              run: |
+                if [ -f buch.zip ]; then
+                  rm buch.zip
+                fi
+                zip -r buch.zip dist
+                # Archive artifacts
+                # archive buch.zip
+
+      - name: Build Docker Image
+        run: echo 'TODO: Build and publish Docker image'
+
+      - name: Deployment for Kubernetes
+        run: echo 'TODO: Deployment for Kubernetes with Ansible, Terraform'
