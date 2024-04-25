@@ -1,9 +1,8 @@
 name: Film Pipeline
 on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
+    push:
+      branches:
+        - main
 jobs:
   setup:
     runs-on: ubuntu-latest
