@@ -127,6 +127,8 @@ Webbrowser `http://localhost:8080` oder `https://localhost:8443` aufgerufen hat:
             Required User Actions:      Überprüfen, dass nichts ausgewählt ist
             Username                    admin
             Email                       admin@acme.com
+            First name                  admin
+            Last name                   admin
             <Create> anklicken
             Tab "Credentials"
                 <Set password> anklicken
@@ -146,6 +148,8 @@ Webbrowser `http://localhost:8080` oder `https://localhost:8443` aufgerufen hat:
             Required User Actions:      Überprüfen, dass nichts ausgewählt ist
             Username                    user
             Email                       user@acme.com
+            First name                  user
+            Last name                   user
             <Create> anklicken
             Tab "Credentials"
                 <Set password> anklicken
