@@ -1,18 +1,3 @@
-// Copyright (C) 2019 - present Juergen Zimmermann, Hochschule Karlsruhe
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-//
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU General Public License for more details.
-//
-// You should have received a copy of the GNU General Public License
-// along with this program.  If not, see <https://www.gnu.org/licenses/>.
-
 // Preview durch <Strg><Shift>v
 
 = Projekthandbuch
@@ -66,10 +51,10 @@ ligula. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere
 cubilia Curae; Donec velit neque, auctor sit amet aliquam vel, ullamcorper sit
 amet ligula.
 
-."BuchGetController" für Lesezugriffe an der REST-Schnittstelle
-[plantuml,BuchGetController,svg]
+."FilmGetController" für Lesezugriffe an der REST-Schnittstelle
+[plantuml,FilmGetController,svg]
 ----
-include::BuchGetController.plantuml[]
+include::FilmGetController.plantuml[]
 ----
 
 Curabitur arcu erat, accumsan id imperdiet et, porttitor at sem. Donec
@@ -84,48 +69,48 @@ include::sequenzdiagramm.plantuml[]
 Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
 tempor invidunt ut.
 
-."BuchWriteController" für Schreibzugriffe an der REST-Schnittstelle
-[plantuml,BuchGetController,svg]
+."FilmWriteController" für Schreibzugriffe an der REST-Schnittstelle
+[plantuml,FilmGetController,svg]
 ----
-include::BuchWriteController.plantuml[]
+include::FilmWriteController.plantuml[]
 ----
 
 === Die GraphQL-Schnittstelle
 
 Donec sollicitudin molestie malesuada. Donec rutrum congue leo eget malesuada.
 
-.BuchQueryResolver für Lesezugriffe an der GraphQL-Schnittstelle
-[plantuml,BuchQueryResolver,svg]
+.FilmQueryResolver für Lesezugriffe an der GraphQL-Schnittstelle
+[plantuml,FilmQueryResolver,svg]
 ----
-include::BuchQueryResolver.plantuml[]
+include::FilmQueryResolver.plantuml[]
 ----
 
 Donec sollicitudin molestie malesuada. Praesent sapien massa, convallis a
 pellentesque nec, egestas non nisi.
 
-.BuchMutationResolver für Schreibzugriffe an der GraphQL-Schnittstelle
-[plantuml,BuchMutationResolver,svg]
+.FilmMutationResolver für Schreibzugriffe an der GraphQL-Schnittstelle
+[plantuml,FilmMutationResolver,svg]
 ----
-include::BuchMutationResolver.plantuml[]
+include::FilmMutationResolver.plantuml[]
 ----
 
 === Die Geschäftslogik
 
 Donec rutrum congue leo eget malesuada. Donec rutrum congue leo eget malesuada.
 
-."BuchReadService" von der Geschäftslogik
-[plantuml,BuchReadService,svg]
+."FilmReadService" von der Geschäftslogik
+[plantuml,FilmReadService,svg]
 ----
-include::BuchReadService.plantuml[]
+include::FilmReadService.plantuml[]
 ----
 
 Pellentesque in ipsum id orci porta dapibus. Donec rutrum congue leo eget
 malesuada.
 
-."BuchWriteService" von der Geschäftslogik
-[plantuml,BuchWriteService,svg]
+."FilmWriteService" von der Geschäftslogik
+[plantuml,FilmWriteService,svg]
 ----
-include::BuchWriteService.plantuml[]
+include::FilmWriteService.plantuml[]
 ----
 
 === Klasse für Entities
@@ -134,9 +119,9 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur arcu erat,
 accumsan id imperdiet et, porttitor at sem.
 
 .Entity
-[plantuml,Buch,svg]
+[plantuml,Film,svg]
 ----
-include::Buch.plantuml[]
+include::Film.plantuml[]
 ----
 
 === ER-Diagramm

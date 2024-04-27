@@ -1,0 +1,1073 @@
+{
+  "info": {
+    "name": "GraphQL",
+    "description": "GraphQL-Schnittstelle",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Query",
+      "item": [
+        {
+          "name": "Suche Film mit ID 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit den Properties', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { film } = body.data;\r",
+                  "    const { barcode, fassung, rating, filmart, preis, release, genre, titel } = film;\r",
+                  "    pm.expect(barcode).to.be.a('string');\r",
+                  "    pm.expect(fassung).to.be.a('number').that.is.gte(0);\r",
+                  "    pm.expect(rating).to.be.a('number').that.is.gte(0);\r",
+                  "    pm.expect(filmart).to.be.a('string');\r",
+                  "    pm.expect(preis).to.be.a('number').that.is.gte(0);\r",
+                  "    pm.expect(release).to.be.a('string');\r",
+                  "    pm.expect(genre).to.be.an('array');\r",
+                  "    pm.expect(titel.titel).to.be.a('string');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($id: ID! = \"1\") {\r\n  film(id: $id) {\r\n    barcode\r\n    fassung\r\n    rating\r\n    filmart\r\n    preis\r\n    release\r\n    genre\r\n    titel {\r\n      titel\r\n    }\r\n  }\r\n}",
+                "variables": "{\r\n  \"id\": \"1\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche barcode von einem Film mit nicht-vorhandener 999999",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit errors', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.include('999999');\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('film');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($id: ID! = \"1\") {\r\n  film(id: $id) {\r\n    barcode\r\n  }\r\n}",
+                "variables": "{\r\n  \"id\": \"999999\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche barcode, fassung und titel von allen Filmen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit den Properties', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { filme } = body.data;\r",
+                  "    pm.expect(filme).to.be.an('array').that.is.not.empty;\r",
+                  "    filme.forEach(film => {\r",
+                  "        const { id, fassung, filmart, titel } = film;\r",
+                  "        pm.expect(id).to.be.a('number').that.is.gte(0);\r",
+                  "        pm.expect(fassung).to.be.a('number').that.is.gte(0);\r",
+                  "        pm.expect(filmart).to.be.a('string');\r",
+                  "        pm.expect(titel.titel).to.be.a('string');\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "{\r\n  filme {\r\n    id\r\n    fassung\r\n    filmart\r\n    titel {\r\n      titel\r\n    }\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche filmart von Filmen mit Titel Die Welt",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit filmart', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { filme } = body.data;\r",
+                  "    pm.expect(filme).to.be.an('array').that.is.not.empty;\r",
+                  "    filme.map(film => film.filmart)\r",
+                  "        .forEach(filmart => pm.expect(filmart).to.be.a('string'));\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($titel: String = \"Die Welt\") {\r\n  film(suchkriterien: {titel: $titel}) {\r\n    filmart\r\n  }\r\n}",
+                "variables": "{\r\n  \"titel\": \"Die Welt\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche filmart, genre, titel von Filmen mit Teilstring \"Die\" im Titel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit filmart, schlagwoerter, titel', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { filme } = body.data;\r",
+                  "    pm.expect(filme).to.be.an('array').that.is.not.empty;\r",
+                  "    filme.forEach(film => {\r",
+                  "        const { filmart, schlagwoerter, titel } = film;\r",
+                  "        pm.expect(filmart).to.be.a('string');\r",
+                  "        pm.expect(schlagwoerter).to.be.an('array');\r",
+                  "        pm.expect(titel.titel).to.be.a('string').that.includes('Die');\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($titel: String = \"a\") {\r\n  filme(suchkriterien: {titel: $titel}) {\r\n    filmart\r\n    genre\r\n    titel {\r\n      titel\r\n    }\r\n  }\r\n}",
+                "variables": "{\r\n  \"titel\": \"Die\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche von Filmen mit nicht-vorhandenem Titel",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit errors', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.be.a('string').that.includes('titel');\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('filme');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($titel: String = \"Nichtvorhanden\") {\r\n  filme(suchkriterien: {titel: $titel}) {\r\n    filmart\r\n  }\r\n}",
+                "variables": "{\r\n  \"titel\": \"Nichtvorhanden\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche von Filmen mit rating 2",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit rating und titel', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { filme } = body.data;\r",
+                  "    pm.expect(filme).to.be.an('array').that.is.not.empty;\r",
+                  "    filme.forEach(film => {\r",
+                  "        const { rating, titel } = film;\r",
+                  "        pm.expect(rating).to.be.a('number').that.is.eq(2);\r",
+                  "        pm.expect(titel.titel).to.be.a('string')\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($rating: Int = 2) {\r\n  filme(suchkriterien: {rating: $rating}) {\r\n    rating\r\n    titel {\r\n        titel\r\n    }\r\n  }\r\n}",
+                "variables": "{\r\n  \"rating\": 2\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche von Filmen mit nicht-vorhandenem rating",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit errors', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.be.a('string').that.includes('rating');\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('filme');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($rating: Int = 99) {\r\n  filme(suchkriterien: {rating: $rating}) {\r\n    filmart\r\n  }\r\n}",
+                "variables": "{\r\n  \"rating\": 99\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche von Filmen mit Filmart DVD",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit filmart und titel', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { filme } = body.data;\r",
+                  "    pm.expect(filme).to.be.an('array').that.is.not.empty;\r",
+                  "    filme.forEach(film => {\r",
+                  "        const { filmart, titel } = film;\r",
+                  "        pm.expect(filmart).to.be.a('string').that.is.eq('DVD');\r",
+                  "        pm.expect(titel.titel).to.be.a('string').that.is.not.empty;\r",
+                  "    });\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($filmart: Filmart = DVD) {\r\n  filme(suchkriterien: {filmart: $filmart}) {\r\n    filmart\r\n    titel {\r\n      titel\r\n    }\r\n  }\r\n}",
+                "variables": "{\r\n  \"filmart\": \"DVD\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Suche von Filmen mit ungueltiger Filmart",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 400', () => {\r",
+                  "    pm.response.to.have.status(400);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit errors', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { extensions } = errors[0];\r",
+                  "    pm.expect(extensions.code).to.be.equal('GRAPHQL_VALIDATION_FAILED');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "query ($filmart: String = \"UNGUELTIG\") {\r\n  filme(suchkriterien: {filmart: $filmart}) {\r\n    filmart\r\n  }\r\n}",
+                "variables": "{\r\n  \"filmart\": \"UNGUELTIG\"\r\n}"
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Queries mit der GraphQL-Schnittstelle"
+    },
+    {
+      "name": "Login",
+      "item": [
+        {
+          "name": "Login als admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit Token und Rollen', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { access_token, expires_in, roles } = body.data.login;\r",
+                  "    pm.expect(access_token).to.be.a('string').that.matches(/.+\\..+\\..+/u);\r",
+                  "    pm.expect(expires_in).to.be.a('number');\r",
+                  "    pm.expect(roles).to.be.an('array').that.is.not.empty;\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n    login(username: \"admin\", password: \"p\") {\r\n        access_token\r\n        expires_in\r\n        refresh_token\r\n        refresh_expires_in\r\n        roles\r\n    }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [""],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n    refresh(refresh_token: \"eyJhbGciOiJIUzUxMiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICIwY2I2ODg2ZC0wN2UwLTQ3NWYtOGNhZS02ZjA0ZmNlNTFhNGEifQ.eyJleHAiOjE3MTQyNDQ3MDMsImlhdCI6MTcxNDE1ODMwMywianRpIjoiNWM0NzlkZTMtNGZiZS00Njc0LTg0MTYtZTRmYjVhYjgxY2ExIiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6ODQ0My9yZWFsbXMvYWNtZSIsImF1ZCI6Imh0dHBzOi8vbG9jYWxob3N0Ojg0NDMvcmVhbG1zL2FjbWUiLCJ0eXAiOiJJbml0aWFsQWNjZXNzVG9rZW4ifQ.iNBajc401s9I71p5TqP6aXXqHOOxssmIP41CjfNLs5AOk9Th4oe1LPGUNHVB-LwKQ7GgrGFUIWpxAmlHVNRqLw\") {\r\n        access_token\r\n        expires_in\r\n        refresh_token\r\n        refresh_expires_in\r\n        roles\r\n    }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login mit falschem Passwort",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit Fehlermeldung', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const error = errors[0];\r",
+                  "    const { message, path, extensions } = error;\r",
+                  "    pm.expect(message).to.be.a('string').that.includes('Passwort');\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('login');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n    login(username: \"admin\", password: \"FALSCH\") {\r\n        token\r\n    }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Login mit der GraphQL-Schnittstelle"
+    },
+    {
+      "name": "Mutation",
+      "item": [
+        {
+          "name": "Neuer Film",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit den Properties', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { data } = body;\r",
+                  "    pm.expect(data.create.id).to.be.a('number').that.is.gte(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  create(\r\n    input: {\r\n      barcode: \"0-000000001111\",\r\n      rating: 1,\r\n      filmart: DVD,\r\n      preis: 99.99,\r\n      release: \"2022-01-31\",\r\n      genre: [\"COMEDY\", \"ACTION\"],\r\n      titel: {\r\n        titel: \"Mutation\",\r\n        untertitel: \"eins\"\r\n      },\r\n      abbildungen: [{\r\n        beschriftung: \"Abb. 1\",\r\n        contentType: \"img/png\"\r\n      }]\r\n    }\r\n  ) {\r\n      id\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Neuer Film mit ungültigen Daten",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Fehlermeldungen im Response Body', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.be.a('string');\r",
+                  "    const props = ['titel.titel', 'barcode', 'rating', 'preis', 'release'];\r",
+                  "    props.forEach(prop => pm.expect(message).to.include(prop));\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('create');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  create(\r\n    input: {\r\n      barcode: \"falscher-BARCODE\",\r\n      rating: 999,\r\n      filmart: DVD,\r\n      preis: -1,\r\n      release: \"12345-123-123\",\r\n      genre: [\"JAVASCRIPT\"],\r\n      titel: {\r\n        titel: \"?!\"\r\n        untertitel: \"mutationinvalid\"\r\n      }\r\n    }\r\n  ) {\r\n      id\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Film mit ID 40 aktualisieren",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit aktualisierter Fassungssnummer', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { data } = body;\r",
+                  "    pm.expect(data.update.fassung).to.be.a('number').that.is.gte(0);\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  update(\r\n    input: {\r\n      id: \"40\",\r\n      fassung: 0,\r\n      barcode: \"0-000000000040\",\r\n      rating: 5,\r\n      filmart: DVD,\r\n      preis: 444.44,\r\n      release: \"2022-04-04\",\r\n      genre: [\"ACTION\", \"COMEDY\",\"HORROR\"]\r\n    }\r\n  ) {\r\n      fassung\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Film mit ID 40 mit ungültigen Daten aktualisieren",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Fehlermeldungen im Response Body', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.be.a('string');\r",
+                  "    const props = ['barcode', 'preis', 'release''];\r",
+                  "    props.forEach(prop => pm.expect(message).to.include(prop));\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('update');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  update(\r\n    input: {\r\n      id: 40,\r\n      fassung: 0,\r\n      barcode: \"falscher-BARCODE\",\r\n      rating: -1,\r\n      filmart: DVD,\r\n      preis: -1,\r\n      release: \"12345-123-123\",\r\n    }\r\n  ) {\r\n      fassung\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Nicht-Vorhandener Film aktualisieren",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Fehlermeldungen im Response Body', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { errors } = body;\r",
+                  "    pm.expect(errors).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    const { message, path, extensions } = errors[0];\r",
+                  "    pm.expect(message).to.be.a('string').that.includes('999999');\r",
+                  "    pm.expect(path).to.be.an('array').that.has.a.lengthOf(1);\r",
+                  "    pm.expect(path[0]).to.be.equal('update');\r",
+                  "    pm.expect(extensions.code).to.be.equal('BAD_USER_INPUT');\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  update(\r\n    input: {\r\n      id: \"999999\",\r\n      fassung: 0,\r\n      barcode: \"0-000000000040\",\r\n      rating: 5,\r\n      filmart: DVD,\r\n      preis: 99.99,\r\n      release: \"2022-02-01\",\r\n      genre: [\"ACTION\", \"COMEDY\"],\r\n    }\r\n  ) {\r\n      fassung\r\n  }\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Film mit ID 60 löschen",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Statuscode 200', () => {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "pm.test('Content-Type application/json', () => {\r",
+                  "    const { response } = pm;\r",
+                  "    const contentType = response.headers.get('Content-Type');\r",
+                  "    pm.expect(contentType).to.match(/^application\\/json(; charset=utf-8)?/u);\r",
+                  "});\r",
+                  "pm.test('Body mit den Properties', () => {\r",
+                  "    const body = pm.response.json();\r",
+                  "    const { data } = body;\r",
+                  "    pm.expect(data.delete).to.be.true;\r",
+                  "});"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "graphql",
+              "graphql": {
+                "query": "mutation {\r\n  delete(id: \"60\")\r\n}",
+                "variables": ""
+              }
+            },
+            "url": {
+              "raw": "{{graphql_url}}",
+              "host": ["{{graphql_url}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "description": "Neuanlegen, Ändern und Löschen mit der GraphQL-Schnittstelle",
+      "auth": {
+        "type": "bearer",
+        "bearer": [
+          {
+            "key": "token",
+            "value": "{{TOKEN}}",
+            "type": "string"
+          }
+        ]
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.sendRequest({",
+              "    url: 'https://localhost:3000/graphql',",
+              "    method: 'POST',",
+              "    header: {",
+              "        'Content-Type': 'application/json',",
+              "    },",
+              "    body: JSON.stringify({",
+              "        query: `",
+              "            mutation {",
+              "                login(username: \"admin\", password: \"p\") {",
+              "                    access_token",
+              "                }",
+              "            }",
+              "        `",
+              "    })",
+              "}, (err, res) => {",
+              "    pm.collectionVariables.set('TOKEN', res.json().data.login.access_token);",
+              "});"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [""]
+          }
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "graphql_url",
+      "value": "{{base_url}}/graphql",
+      "type": "string"
+    },
+    {
+      "key": "TOKEN",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

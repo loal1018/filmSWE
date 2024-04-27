@@ -3,7 +3,7 @@
   "files.eol": "\n",
   "files.associations": {
     "*.csv": "csv (semicolon)"
-},
+  },
   "typescript.tsdk": "node_modules/typescript/lib",
   "workbench.colorCustomizations": {
     "activityBar.activeBackground": "#2f7c47",
@@ -24,5 +24,6 @@
     "titleBar.inactiveBackground": "#21573299",
     "titleBar.inactiveForeground": "#e7e7e799"
   },
-  "peacock.color": "#215732"
+  "peacock.color": "#215732",
+  "asciidoc.antora.enableAntoraSupport": true
 }

@@ -1,0 +1,109 @@
+' Preview durch <Alt>d
+
+@startuml Controller-Klasse
+
+interface Promise<T>
+
+package @nestjs/common {
+  class "@Controller" as Controller
+  hide Controller circle
+
+  class "@UseGuards" as UseGuards
+  hide UseGuards circle
+
+  class "@UseInterceptors" as UseInterceptors
+  hide UseInterceptors circle
+
+  class "@Post" as Post
+  hide Post circle
+
+  class "@Put" as Put
+  hide Put circle
+
+  class "@Delete" as Delete
+  hide Delete circle
+
+  class "@Req" as Req
+  hide Req circle
+
+  class "@Res" as Res
+  hide Res circle
+
+  class "@Param" as Param
+  hide Param circle
+
+  class "@Body" as Body
+  hide Body circle
+
+  class "@Headers" as Headers
+  hide Headers circle
+
+  UseInterceptors .[hidden].> Post
+  UseInterceptors .[hidden].> Put
+  UseInterceptors .[hidden].> Delete
+
+  Post .[hidden].> Req
+  Post .[hidden].> Res
+  Post .[hidden].> Param
+  Post .[hidden].> Body
+  Post .[hidden].> Headers
+}
+
+package nest-keycloak-connect {
+  class AuthGuard
+
+  class "@Roles" as Roles
+  hide Roles circle
+}
+
+package express {
+  class Request
+  class Response
+
+  Response .right[hidden].> Controller
+}
+
+package film {
+  package entity #FFFFFF {
+    class Film <<entity>>
+
+    Film .[hidden].> Promise
+    Film .[hidden].> Request
+  }
+
+  package service {
+    class FilmWriteService << control >>
+    class FilmReadService << control >>
+  }
+
+  package rest #DDDDDD {
+    class FilmWriteController << control >> << @Controller() >> << @UseGuards() >> << @UseInterceptors() >> {
+      + @Post() @Roles() async post(@Body() film: Film, @Req() req: Request,  @Res() res: Response): Promise<Response>
+      + @Put() @Roles() async put(@Body() film: Film, @Param() id: number, @Headers() version: string, @Res() res: Response): Promise<Response>
+      + @Delete() @Roles() async delete(@Param() id: number, @Res() res: Response): Promise<Response>
+    }
+
+    FilmWriteController o--> "1" FilmWriteService : service
+    FilmWriteController o--> "1" FilmReadService : readService
+    FilmWriteController ..up> Film
+
+    FilmWriteController ..> Controller
+
+    FilmWriteController .up.> AuthGuard
+    FilmWriteController .up.> Roles
+
+    FilmWriteController ..> Request
+    FilmWriteController ..> Response
+    FilmWriteController ..> Promise
+
+    Filmk .up[hidden].> Roles
+    FilmWriteController .[hidden].> Request
+    FilmWriteController .[hidden].> Promise
+  }
+}
+
+hide empty members
+
+footer (c) Juergen Zimmermann
+
+@enduml

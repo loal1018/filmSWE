@@ -19,14 +19,12 @@
 
 actor Gast
 
-boundary BuchGetController
-control BuchReadService
-database buch
+boundary FilmGetController
+control FilmReadService
+database film
 
-Gast -> BuchGetController : GET / getById()
-BuchGetController -> BuchReadService: findById()
-BuchReadService -> buch: [TypeORM]
-
-footer (c) Jürgen Zimmermann
+Gast -> FilmGetController : GET / getById()
+FilmGetController -> FilmReadService: findById()
+FilmReadService -> film: [TypeORM]
 
 @enduml

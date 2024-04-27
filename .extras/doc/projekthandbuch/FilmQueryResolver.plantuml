@@ -1,0 +1,65 @@
+' Preview durch <Alt>d
+
+@startuml Controller-Klasse
+
+interface Promise<T>
+
+package @nestjs/graphql {
+  class "@Resolver" as Resolver
+  hide Resolver circle
+
+  class "@UseInterceptors" as UseInterceptors
+  hide UseInterceptors circle
+
+  class "@Query" as Query
+  hide Query circle
+
+  class "@Args" as Args
+  hide Args circle
+
+  Resolver .left[hidden].> Promise
+}
+
+package film {
+  package entity {
+    class Film <<entity>>
+  }
+
+  package service {
+    class FilmReadService << control >>
+  }
+
+  package graphql #DDDDDD {
+    class "type FilmDTO = Omit<Film, 'abbildungen' | 'aktualisiert' | 'erzeugt'" as FilmDTO
+    hide FilmDTO circle
+
+    interface IdInput {
+        id: number
+    }
+
+    class FilmQueryResolver << control >> << @Resolver() >> << @UseInterceptors() >> {
+      + @Query() async film(@Args() id: IdInput): Promise<FilmDTO>
+      + @Query() async filme(@Args() titel: string | undefined): Promise<FilmDTO[]>
+    }
+
+    FilmQueryResolver o-up-> "1" FilmReadService : service
+    FilmQueryResolver ..> FilmDTO
+    FilmQueryResolver ..> IdInput
+    FilmDTO ..> Film
+    FilmQueryResolver ..> Resolver
+
+    FilmQueryResolver ..> Promise
+
+    FilmDTO .[hidden].> Film
+    Film .[hidden].> Promise
+    FilmReadService .[hidden].> Promise
+    Film .[hidden].> Resolver
+    FilmReadService .[hidden].> Resolver
+  }
+}
+
+hide empty members
+
+footer (c) Juergen Zimmermann
+
+@enduml

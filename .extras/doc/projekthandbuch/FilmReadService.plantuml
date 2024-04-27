@@ -1,0 +1,52 @@
+' Preview durch <Alt>d
+
+@startuml Anwendungskern
+
+interface Promise<T>
+
+package @nestjs/common {
+  class "@Injectable" as Injectable
+  hide Injectable circle
+}
+
+package typeorm {
+  class Repository<T>
+}
+
+package @nestjs/typeorm {
+  class "@InjectRepository" as InjectRepository
+  hide InjectRepository circle
+}
+
+package film {
+  package entity {
+    class Film
+  }
+
+  package service #DDDDDD {
+    class QueryBuilder
+
+    class FilmReadService << control >> <<@Injectable()>> {
+      + async findById(id: number): Promise<Film | undefined>
+      + async find(suchkriterien?: Record<string, any>): Promise<Film[]>
+    }
+
+    FilmReadService o--> "1" QueryBuilder: queryBuilder
+    FilmReadService o--> "1" Repository: @InjectRepository repo
+
+    FilmReadService .up.> Injectable
+    FilmReadService .up.> InjectRepository
+
+    FilmReadService .up.> Promise
+    FilmReadService ..> Film
+
+    QueryBuilder .[hidden].> Repository
+    QueryBuilder .[hidden].> Film
+  }
+}
+
+hide empty members
+
+footer (c) Jürgen Zimmermann
+
+@enduml

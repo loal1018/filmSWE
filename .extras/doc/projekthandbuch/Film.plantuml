@@ -1,0 +1,60 @@
+@startuml Entity
+
+package typeorm {
+  class "@Entity" as Entity
+  hide Entity circle
+  class "@Column" as Column
+  hide Column circle
+  class "@PrimaryColumn" as PrimaryColumn
+  hide PrimaryColumn circle
+  class "@OneToMany" as OneToMany
+  hide OneToMany circle
+  class "@JoinColumn" as JoinColumn
+  hide JoinColumn circle
+  class "@ManyToOne" as ManyToOne
+  hide ManyToOne circle
+  class "@CreateDateColumn" as CreateDateColumn
+  hide CreateDateColumn circle
+  class "@UpdateDateColumn" as UpdateDateColumn
+  hide UpdateDateColumn circle
+}
+
+package buch.entity {
+  class "type FilmArt = 'DVD' | 'BLURAY'" as FilmArt
+  hide FilmArt circle
+
+  class Film <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly fassung: number
+    @Column() readonly barcode: string
+    @Column() readonly rating: number
+    @Column() readonly filmart: FuchArt
+    @Column() readonly preis: number
+    @Column() readonly release: Date
+    @Column() readonly genre?: string
+    @CreateDateColumn() readonly erzeugt: Date
+    @UpdateDateColumn() readonly aktualisiert: Date
+  }
+
+  class Titel <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly titel: string
+    @Column() readonly untertitel?: string
+  }
+
+  class Abbildung <<entity>> <<@Entity>> {
+    @Column() @PrimaryColumn() readonly id: number
+    @Column() readonly beschriftung: string
+    @Column() readonly contentType?: string
+  }
+
+  Film *--> "1" Titel : @OneToOne() \ntitel
+  Film *--> "*" Abbildung : @OneToMany() \nabbildungen
+
+  Film .right.> Entity
+  Film .right.> FilmArt
+}
+
+hide empty members
+
+@enduml

@@ -1,0 +1,71 @@
+' Preview durch <Alt>d
+
+@startuml Anwendungskern
+
+interface Promise<T>
+
+package @nestjs/common {
+  class "@Injectable" as Injectable
+  hide Injectable circle
+}
+
+package typeorm {
+  class Repository<T>
+}
+
+package @nestjs/typeorm {
+  class "@InjectRepository" as InjectRepository
+  hide InjectRepository circle
+}
+
+package mail {
+  class MailService
+}
+
+package film {
+  package entity {
+    class Film
+  }
+
+  package service #DDDDDD {
+    class FilmInvalid
+    class TitelExists
+    class BarcodeExistsExists
+    class VersionInvalid
+    class VersionOutdated
+
+    class FilmWriteService << control >> <<@Injectable()>> {
+      + async create(film: Film): Promise<string|FilmInvalid|TitelExists|BarcodeExists>
+      + async update(id: number, film: Film, fassung: string): Promise<number|FilmInvalid|TitelExists|BarcodeExists|VersionInvalid|VersionOutdated>
+      + async delete(id: number): Promise<boolean>
+    }
+
+    FilmWriteService o--> "1" FilmValidationService: validationService
+    FilmWriteService o--> "1" FilmReadService: readService
+    FilmWriteService o--> "1" Repository: @InjectRepository repo
+
+    FilmWriteService .up.> Injectable
+    FilmWriteService .up.> InjectRepository
+
+    FilmWriteService .up.> Promise
+    FilmWriteService ..> Film
+    FilmWriteService .up.> FilmInvalid
+    FilmWriteService .up.> TitelExists
+    FilmWriteService .up.> BarcodeExists
+    FilmWriteService .up.> VersionInvalid
+    FilmWriteService .up.> VersionOutdated
+
+    FilmInvalid .up[hidden].> Film
+    Film .up[hidden].> Promise
+    Film .up[hidden].> Injectable
+    Film .up[hidden].> InjectRepository
+    TitelExists .up[hidden].> Film
+    FilmValidationService .[hidden].> Repository
+  }
+}
+
+hide empty members
+
+footer (c) Jürgen Zimmermann
+
+@enduml
