@@ -44,7 +44,7 @@ export interface CreatePayload {
 }
 
 export interface UpdatePayload {
-    readonly version: number;
+    readonly fassung: number;
 }
 
 export class FilmUpdateDTO extends FilmDTO {
@@ -53,7 +53,7 @@ export class FilmUpdateDTO extends FilmDTO {
 
     @IsInt()
     @Min(0)
-    readonly version!: number;
+    readonly fassung!: number;
 }
 @Resolver()
 // alternativ: globale Aktivierung der Guards https://docs.nestjs.com/security/authorization#basic-rbac-implementation
@@ -88,16 +88,16 @@ export class FilmMutationResolver {
         this.#logger.debug('update: film=%o', filmDTO);
 
         const film = this.#filmUpdateDtoToFilm(filmDTO);
-        const fassungStr = `"${filmDTO.version.toString()}"`;
+        const fassungStr = `"${filmDTO.fassung.toString()}"`;
 
-        const versionResult = await this.#service.update({
+        const fassungResult = await this.#service.update({
             id: Number.parseInt(filmDTO.id, 10),
             film,
             fassung: fassungStr,
         });
         // TODO BadUserInputError
-        this.#logger.debug('updateFilm: versionResult=%d', versionResult);
-        const payload: UpdatePayload = { version: versionResult };
+        this.#logger.debug('updateFilm: fassungResult=%d', fassungResult);
+        const payload: UpdatePayload = { fassung: fassungResult };
         return payload;
     }
 

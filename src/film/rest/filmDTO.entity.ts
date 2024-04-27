@@ -58,10 +58,6 @@ export class FilmDtoOhneRef {
     @ApiProperty({ example: '1234567890000', type: String })
     readonly barcode!: string;
 
-    @Min(1)
-    @ApiProperty({ example: 1, type: Number })
-    readonly fassung: number | undefined;
-
     @IsOptional()
     @ApiProperty({ example: 'Horror', type: String })
     readonly genre: string[] | undefined;

@@ -124,7 +124,7 @@ input FilmUpdateInput {
 }
 
 type UpdatePayload {
-  version: Int
+  fassung: Int
 }
 
 type LoginResult {

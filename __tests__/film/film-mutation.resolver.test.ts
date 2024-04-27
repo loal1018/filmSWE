@@ -188,7 +188,7 @@ describe('GraphQL Mutations', () => {
                             genre: ["HORROR", "THRILLER", "SCI-FI"],
                         }
                     ) {
-                        version
+                        fassung
                     }
                 }
             `,
@@ -206,7 +206,7 @@ describe('GraphQL Mutations', () => {
         const { update } = data.data!;
 
         // Der Wert der Mutation ist die neue Versionsnummer
-        expect(update.version).toBe(1);
+        expect(update.fassung).toBe(1);
     });
 
     // -------------------------------------------------------------------------
@@ -221,7 +221,7 @@ describe('GraphQL Mutations', () => {
                     update(
                         input: {
                             id: "${id}",
-                            version: 0,
+                            fassung: 0,
                             barcode: "falscher-Barcode",
                             rating: -1,
                             filmart: Zementblock,
@@ -230,7 +230,7 @@ describe('GraphQL Mutations', () => {
                             genre: 8,       
                         }
                     ) {
-                        version
+                        fassung
                     }
                 }
             `,
@@ -278,7 +278,7 @@ describe('GraphQL Mutations', () => {
                     update(
                         input: {
                             id: "${id}",
-                            version: 0,
+                            fassung: 0,
                             barcode: "4-011470212981",
                             rating: 1,
                             filmart: BLUERAY,
@@ -287,7 +287,7 @@ describe('GraphQL Mutations', () => {
                             genre: ["HORROR", "THRILLER"],
                         }
                     ) {
-                        version
+                        fassung
                     }
                 }
             `,

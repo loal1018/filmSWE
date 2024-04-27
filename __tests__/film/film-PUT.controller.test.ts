@@ -168,7 +168,7 @@ describe('PUT /rest/:id', () => {
         expect(messages).toEqual(expect.arrayContaining(expectedMsg));
     });
 
-    test('Vorhandener Film aendern, aber ohne Versionsnummer', async () => {
+    test('Vorhandener Film aendern, aber ohne Fassungsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
@@ -187,7 +187,7 @@ describe('PUT /rest/:id', () => {
         expect(data).toBe('Header "If-Match" fehlt');
     });
 
-    test('Vorhandener Film aendern, aber mit alter Versionsnummer', async () => {
+    test('Vorhandener Film aendern, aber mit alter Fassungsnummer', async () => {
         // given
         const url = `/rest/${idVorhanden}`;
         const token = await loginRest(client);
@@ -206,7 +206,7 @@ describe('PUT /rest/:id', () => {
 
         const { message, statusCode } = data;
 
-        expect(message).toMatch(/Versionsnummer/u);
+        expect(message).toMatch(/Fassungsnummer/u);
         expect(statusCode).toBe(HttpStatus.PRECONDITION_FAILED);
     });
 
