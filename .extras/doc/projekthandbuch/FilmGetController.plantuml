@@ -1,0 +1,72 @@
+@startuml Controller-Klasse
+
+interface Promise<T>
+
+package @nestjs/common {
+  class "@Controller" as Controller
+  hide Controller circle
+
+  class "@Get" as Get
+  hide Get circle
+
+  class "@Req" as Req
+  hide Req circle
+
+  class "@Res" as Res
+  hide Res circle
+
+  class "@Param" as Param
+  hide Param circle
+
+  class "@Query" as Query
+  hide Query circle
+
+  class "@UseInterceptors" as UseInterceptors
+  hide UseInterceptors circle
+}
+
+package express {
+  class Request
+  class Response
+
+  Response .[hidden].> Controller
+}
+
+package film {
+  package entity #FFFFFF {
+    class Film <<entity>>
+
+    Film .[hidden].> Promise
+    Film .[hidden].> Request
+  }
+
+  package service {
+    class FilmReadService << control >>
+  }
+
+  package rest #DDDDDD {
+    FilmQuery -up-|> Film
+
+    class FilmGetController << control >> << @Controller() >> << @UseInterceptors() >> {
+      + @Get() async getId(@Param() id: number, @Req() req: Request, @Headers() version: string, @Res() res: Response): Promise<Response<BuchModel | undefined>>
+      + @Get() async get(@Query() query: FilmQuery, @Req() req: Request,  @Res() res: Response): Promise<Response<BuecherModel | undefined>>
+    }
+
+    FilmGetController o--> "1" BuchReadService : service
+
+    FilmGetController ..> Controller
+    FilmGetController ..> Request
+    FilmGetController ..> Response
+    FilmGetController ..> Promise
+    FilmGetController .up.> FilmModel
+    FilmGetController .up.> FilmQuery
+
+    FilmReadService .[hidden].> Request
+    FilmReadService .[hidden].> Promise
+    Response .right[hidden].> Controller
+  }
+}
+
+hide empty members
+
+@enduml
