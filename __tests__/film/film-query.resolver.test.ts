@@ -43,13 +43,13 @@ type FilmDTO = Omit<Film, 'abbildungen' | 'aktualisiert' | 'erzeugt'>;
 // -----------------------------------------------------------------------------
 // T e s t d a t e n
 // -----------------------------------------------------------------------------
-const idVorhanden = '1';
+const idVorhanden = 1;
 
-const titelVorhanden = 'Alpha';
-const teilTitelVorhanden = 'a';
-const teilTitelNichtVorhanden = 'abc';
+const titelVorhanden = 'Der Mond';
+const teilTitelVorhanden = 'e';
+const teilTitelNichtVorhanden = '$';
 
-const barcodeVorhanden = '4-011470212981';
+const barcodeVorhanden = '0-000000000020';
 
 const ratingVorhanden = 2;
 const ratingNichtVorhanden = 99;
@@ -86,7 +86,6 @@ describe('GraphQL Queries', () => {
             query: `
                 {
                     film(id: "${idVorhanden}") {
-                        id
                         fassung
                         barcode
                         rating
@@ -151,7 +150,7 @@ describe('GraphQL Queries', () => {
         const [error] = errors!;
         const { message, path, extensions } = error;
 
-        expect(message).toBe(`Es gibt keinen Film mit der ID ${id}.`);
+        expect(message).toBe(`Es gibt kein Film mit der ID ${id}.`);
         expect(path).toBeDefined();
         expect(path![0]).toBe('film');
         expect(extensions).toBeDefined();
@@ -166,7 +165,7 @@ describe('GraphQL Queries', () => {
                     filme(suchkriterien: {
                         titel: "${titelVorhanden}"
                     }) {
-                        art
+                        filmart
                         titel {
                             titel
                         }
@@ -247,7 +246,7 @@ describe('GraphQL Queries', () => {
                     filme(suchkriterien: {
                         titel: "${teilTitelNichtVorhanden}"
                     }) {
-                        art
+                        filmart
                         titel {
                             titel
                         }
@@ -279,7 +278,7 @@ describe('GraphQL Queries', () => {
         expect(extensions!.code).toBe('BAD_USER_INPUT');
     });
 
-    test('Film zu vorhandenem Barcode', async () => {
+    test('Film zu vorhandenem Barcdode', async () => {
         // given
         const body: GraphQLRequest = {
             query: `
@@ -311,11 +310,11 @@ describe('GraphQL Queries', () => {
 
         expect(filme).not.toHaveLength(0);
 
-        const filmeArray: FilmDTO[] = filme;
+        const filmArray: FilmDTO[] = filme;
 
-        expect(filmeArray).toHaveLength(1);
+        expect(filmArray).toHaveLength(1);
 
-        const [film] = filmeArray;
+        const [film] = filmArray;
         const { barcode, titel } = film!;
 
         expect(barcode).toBe(barcodeVorhanden);
@@ -415,7 +414,7 @@ describe('GraphQL Queries', () => {
                     filme(suchkriterien: {
                         art: ${filmArt}
                     }) {
-                        art
+                        filmart
                         titel {
                             titel
                         }
