@@ -75,7 +75,7 @@ export class Film {
     readonly fassung: number | undefined;
 
     @Column()
-    @ApiProperty({ example: '4-011470212981', type: String })
+    @ApiProperty({ example: '0-000000000020', type: String })
     readonly barcode!: string;
 
     @Column('int')
